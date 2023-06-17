@@ -1,0 +1,39 @@
+version: '3.9'
+
+services:
+    channel-challenge-base-node:
+        image: channel-challenge-base-node
+        build:
+            context: ..
+            dockerfile: docker/Dockerfile
+
+    channel-challenge:
+        image: channel-challenge-base-node
+        ports:
+            - 3050:3050
+        networks:
+            - app-net
+        command: './docker/init.sh'
+        volumes:
+            - './../src:/project/src:ro'
+            - './../environments/.env:/project/environments/env:ro'
+        depends_on:
+            - mongo-db
+            - redis-db
+
+    mongo-db:
+        image: mongo
+        ports:
+            - 27016:27017
+        networks:
+            - app-net
+
+    redis-db:
+        image: redis
+        ports:
+            - 6378:6379
+        networks:
+            - app-net
+
+networks:
+    app-net:
