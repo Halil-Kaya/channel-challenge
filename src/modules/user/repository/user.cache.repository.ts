@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { User } from '../../../core/interfaces/mongo-model/user.interface';
+import { User } from '../../../core/interface/mongo-model/user.interface';
 import { InjectRedis } from '@nestjs-modules/ioredis';
 import Redis from 'ioredis';
 import { cacheKeys } from '../../../core/cache/cache-key';

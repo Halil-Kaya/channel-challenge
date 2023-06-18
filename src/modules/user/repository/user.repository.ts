@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { UserMongoRepository } from './user.mongo.repository';
 import { UserCacheRepository } from './user.cache.repository';
-import { User } from '../../../core/interfaces/mongo-model/user.interface';
+import { User } from '../../../core/interface/mongo-model/user.interface';
 import { ClientSession } from 'mongoose';
 
 @Injectable()
@@ -12,10 +12,6 @@ export class UserRepository {
     ) {}
 
     async save(user: Omit<User, '_id' | 'createdAt'>, session?: ClientSession) {
-        const existUser = await this.userMongoRepository.findByNickname(user.nickname);
-        if (existUser) {
-            //TODO: throw error
-        }
         const createdUser = await this.userMongoRepository.save(user, session);
         await this.userCacheRepository.save(createdUser);
         return createdUser;

@@ -1,14 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import { UserRepository } from '../repository';
 import { UserDocument } from '../model/user.model';
-import { User } from '../../../core/interfaces/mongo-model/user.interface';
+import { User } from '../../../core/interface/mongo-model/user.interface';
 import { ClientSession } from 'mongoose';
+import { NicknameAlreadyTakenException } from '../../../core/error';
 
 @Injectable()
 export class UserService {
     constructor(private readonly userRepository: UserRepository) {}
 
-    save(user: Omit<User, '_id' | 'createdAt'>, session?: ClientSession): Promise<UserDocument> {
+    async save(user: Omit<User, '_id' | 'createdAt'>, session?: ClientSession): Promise<UserDocument> {
+        //TODO add redlock mechanizm
+        const existUser = await this.userRepository.findByNickname(user.nickname);
+        if (existUser) {
+            throw new NicknameAlreadyTakenException();
+        }
         return this.userRepository.save(user, session);
     }
 

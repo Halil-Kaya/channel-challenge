@@ -1,6 +1,6 @@
 import { Document, Schema as MongooseSchema, Types } from 'mongoose';
 import { AsyncModelFactory, Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { User } from '../../../core/interfaces/mongo-model/user.interface';
+import { User } from '../../../core/interface/mongo-model/user.interface';
 import { hashSync } from 'bcryptjs';
 
 export type UserDocument = UserModel & Document;
