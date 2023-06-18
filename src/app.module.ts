@@ -31,7 +31,6 @@ import { RedisLockModule } from '@huangang/nestjs-simple-redis-lock';
             }),
             inject: [ConfigService]
         }),
-        RedisLockModule.register({}),
         AuthModule,
         ChannelModule,
         UserModule

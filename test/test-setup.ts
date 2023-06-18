@@ -1,7 +1,9 @@
+import { closeMongoDb, closeRedis, connectMongoDb, connectRedis } from './common/db';
+
 afterAll(async () => {
-    console.log('afterAll');
+    await Promise.all([closeMongoDb(), closeRedis()]);
 });
 
 beforeEach(async () => {
-    console.log('beforeEach');
+    await Promise.all([connectRedis(), connectMongoDb()]);
 });
