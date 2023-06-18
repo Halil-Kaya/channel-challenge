@@ -53,6 +53,7 @@ export const UserFactory: AsyncModelFactory = {
         UserSchema.pre('save', preSave);
         UserSchema.post('find', leanObjectId);
         UserSchema.post('findOne', leanObjectId);
+        UserSchema.post('findOneAndUpdate', preSave);
         UserSchema.post('findOneAndUpdate', leanObjectId);
         return UserSchema;
     }
