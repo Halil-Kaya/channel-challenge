@@ -6,6 +6,7 @@ import { RedisModule } from '@nestjs-modules/ioredis';
 import { AuthModule } from './modules/auth/auth.module';
 import { ChannelModule } from './modules/channel/channel.module';
 import { UserModule } from './modules/user/user.module';
+import { RedisLockModule } from '@huangang/nestjs-simple-redis-lock';
 
 @Module({
     imports: [
@@ -30,6 +31,7 @@ import { UserModule } from './modules/user/user.module';
             }),
             inject: [ConfigService]
         }),
+        RedisLockModule.register({}),
         AuthModule,
         ChannelModule,
         UserModule
