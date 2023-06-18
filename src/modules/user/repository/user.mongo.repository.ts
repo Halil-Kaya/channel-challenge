@@ -9,15 +9,17 @@ export class UserMongoRepository {
     constructor(@InjectModel(UserModel.name) private readonly userModel: Model<UserDocument>) {}
 
     save(user: Omit<User, '_id' | 'createdAt'>, session?: ClientSession) {
-        const newUser = new this.userModel(user);
+        const newUser = new this.userModel({
+            ...user
+        });
         return newUser.save({ session });
     }
 
-    findById(_id: string): Promise<UserDocument> {
+    findById(_id: string): Promise<User> {
         return this.userModel.findById(_id).lean().exec();
     }
 
-    findByNickname(nickname: string): Promise<UserDocument> {
+    findByNickname(nickname: string): Promise<User> {
         return this.userModel
             .findOne({
                 nickname

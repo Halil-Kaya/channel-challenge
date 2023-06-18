@@ -9,13 +9,13 @@ export type UserDocument = UserModel & Document;
     versionKey: false
 })
 export class UserModel implements User {
-    @Prop({ type: MongooseSchema.Types.ObjectId, default: Types.ObjectId })
-    _id: string;
+    @Prop({ type: MongooseSchema.Types.ObjectId, required: false, default: Types.ObjectId })
+    public _id: string;
 
     @Prop({ type: String, required: true })
     fullName: string;
 
-    @Prop({ type: String, required: true })
+    @Prop({ type: String, unique: true, required: true })
     nickname: string;
 
     @Prop({ type: String, minlength: 4, maxlength: 24, select: false, required: true })
@@ -48,6 +48,7 @@ function leanObjectId(result) {
 }
 
 export const UserFactory: AsyncModelFactory = {
+    collection: 'user',
     name: UserModel.name,
     useFactory: () => {
         UserSchema.pre('save', preSave);

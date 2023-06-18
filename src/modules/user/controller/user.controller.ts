@@ -8,7 +8,6 @@ export class UserController {
 
     @Post()
     async create(@Body() createUserDto: UserCreateDto): Promise<void> {
-        console.log('istek geldi', { createUserDto });
         await this.userService.save(createUserDto);
     }
 }

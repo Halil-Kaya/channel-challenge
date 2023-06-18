@@ -4,11 +4,12 @@ import { UserFactory } from './model/user.model';
 import { UserController } from './controller/user.controller';
 import { UserService } from './service/user.service';
 import { UserCacheRepository, UserMongoRepository, UserRepository } from './repository';
-import { RedisLockModule } from '@huangang/nestjs-simple-redis-lock';
+import { LockService } from '../../core/service/lock.service';
 
 @Module({
-    imports: [MongooseModule.forFeatureAsync([UserFactory]), RedisLockModule.register({})],
+    imports: [MongooseModule.forFeatureAsync([UserFactory])],
     controllers: [UserController],
-    providers: [UserService, UserRepository, UserMongoRepository, UserCacheRepository]
+    providers: [UserService, UserRepository, UserMongoRepository, UserCacheRepository, LockService],
+    exports: [UserService]
 })
 export class UserModule {}
