@@ -7,4 +7,4 @@ RUN apk add --update nodejs npm
 
 RUN chmod -R 0777 ./docker/init.sh
 
-RUN npm install
+RUN npm install --force
