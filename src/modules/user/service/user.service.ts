@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { UserRepository } from '../repository/user.repository';
+import { UserRepository } from '../repository';
 import { UserDocument } from '../model/user.model';
 import { User } from '../../../core/interfaces/mongo-model/user.interface';
 import { ClientSession } from 'mongoose';
@@ -8,7 +8,7 @@ import { ClientSession } from 'mongoose';
 export class UserService {
     constructor(private readonly userRepository: UserRepository) {}
 
-    save(user: User, session?: ClientSession): Promise<UserDocument> {
+    save(user: Omit<User, '_id' | 'createdAt'>, session?: ClientSession): Promise<UserDocument> {
         return this.userRepository.save(user, session);
     }
 
