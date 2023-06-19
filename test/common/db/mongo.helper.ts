@@ -1,5 +1,6 @@
-import mongoose from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 import { testConfig } from '../../test-config';
+import { UserModel, UserSchema } from '../../../src/modules/user/model/user.model';
 
 export const mongoDb = mongoose.connection;
 
@@ -9,9 +10,11 @@ export const connectMongoDb = async (): Promise<void> => {
 };
 
 export const resetMongoDb = async (): Promise<void> => {
-    await Promise.all([mongoDb.collection('users').deleteMany({})]);
+    await Promise.all([mongoDb.collection('user').deleteMany({})]);
 };
 
 export const closeMongoDb = async (): Promise<void> => {
     await mongoDb.close();
 };
+
+export const UserMongoModel = <Model<UserModel>>mongoDb.model('user', UserSchema, 'user');
