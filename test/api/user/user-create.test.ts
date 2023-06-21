@@ -1,9 +1,10 @@
 import { createUser } from '../../common/user.helper';
-import { UserMongoModel } from '../../common/db';
+import { getRedis, UserMongoModel } from '../../common/db';
 import { UserCreateDto } from '../../../src/modules/user/dto';
 import * as bcrypt from 'bcryptjs';
 import { MetaInterface } from '../../../src/core/interceptor';
 import { ErrorCode } from '../../../src/core/error';
+import { cacheKeys } from '../../../src/core/cache';
 
 it('should create user', async () => {
     const dto: UserCreateDto = {
@@ -22,6 +23,13 @@ it('should create user', async () => {
     expect(createdUser.createdAt).toBeDefined();
     const isPasswordMatch = bcrypt.compare(createdUser.password, dto.password);
     expect(isPasswordMatch).toBeTruthy();
+
+    const redis = await getRedis();
+    const userInRedis = await redis.hGetAll(cacheKeys.user(createdUser._id));
+    expect(userInRedis._id).toBe(createdUser._id.toString());
+    expect(userInRedis.fullName).toBe(createdUser.fullName);
+    expect(userInRedis.nickname).toBe(createdUser.nickname);
+    expect(userInRedis.createdAt).toBe(createdUser.createdAt.toISOString());
 });
 
 it('should throw error if nickname is taken', async () => {

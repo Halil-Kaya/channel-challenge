@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { UserDocument, UserModel } from '../model/user.model';
 import { ClientSession, Model } from 'mongoose';
-import { User } from '../../../core/interface/mongo-model/user.interface';
+import { User } from "../../../core/interface";
 
 @Injectable()
 export class UserMongoRepository {

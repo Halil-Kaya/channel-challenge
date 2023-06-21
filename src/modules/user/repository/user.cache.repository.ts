@@ -1,9 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { User } from '../../../core/interface/mongo-model/user.interface';
+import { User } from "../../../core/interface";
 import { InjectRedis } from '@nestjs-modules/ioredis';
 import Redis from 'ioredis';
-import { cacheKeys } from '../../../core/cache/cache-key';
-import { cacheTTL } from '../../../core/cache/cache-ttl';
+import { cacheKeys,cacheTTL } from "../../../core/cache";
 
 type SerializedUser = Record<keyof User, string>;
 
@@ -36,7 +35,7 @@ export class UserCacheRepository {
         return {
             _id: user._id.toString(),
             fullName: user.fullName,
-            nickname: user.fullName,
+            nickname: user.nickname,
             password: user.password,
             createdAt: user.createdAt.toISOString()
         };
