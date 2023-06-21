@@ -1,10 +1,9 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Environment } from './core/interface/environment.interface';
+import { Environment } from './core/interface';
 import { RedisModule } from '@nestjs-modules/ioredis';
 import { AuthModule } from './modules/auth/auth.module';
-import { ChannelModule } from './modules/channel/channel.module';
 import { UserModule } from './modules/user/user.module';
 
 @Module({
@@ -31,7 +30,6 @@ import { UserModule } from './modules/user/user.module';
             inject: [ConfigService]
         }),
         AuthModule,
-        ChannelModule,
         UserModule
     ],
     controllers: [],
