@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { UserRepository } from '../repository';
-import { User } from "../../../core/interface";
+import { User } from '../../../core/interface';
 import { ClientSession } from 'mongoose';
-import { NicknameAlreadyTakenException } from '../../../core/error';
-import { cacheKeys } from "../../../core/cache";
-import { cacheTTL } from "../../../core/cache";
-import { LockService } from "../../../core/service";
-import { UserCreateAck } from '../controller/ack/user-create.ack';
+import { NicknameAlreadyTakenException, RaceConditionException } from '../../../core/error';
+import { cacheKeys } from '../../../core/cache';
+import { cacheTTL } from '../../../core/cache';
+import { LockService } from '../../../core/service';
+import { UserCreateAck } from '../controller/ack';
 import { UserCreateDto } from '../controller/dto';
 
 @Injectable()
@@ -14,9 +14,16 @@ export class UserService {
     constructor(private readonly userRepository: UserRepository, private readonly lockService: LockService) {}
 
     async save(user: UserCreateDto, session?: ClientSession): Promise<UserCreateAck> {
-        const lock = await this.lockService.lock(cacheKeys.nickname(user.nickname), {
-            ttl: cacheTTL.lock.nickname
-        });
+        let lock;
+        try {
+            lock = await this.lockService.lock(cacheKeys.nickname(user.nickname), {
+                ttl: cacheTTL.lock.nickname,
+                noRetry: true
+            });
+        } catch (err) {
+            throw new RaceConditionException(`RaceCond: ${cacheKeys.nickname(user.nickname)}`);
+        }
+
         const existUser = await this.userRepository.findByNickname(user.nickname);
         if (existUser) {
             throw new NicknameAlreadyTakenException();
