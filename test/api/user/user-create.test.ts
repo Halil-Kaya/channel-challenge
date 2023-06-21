@@ -39,3 +39,33 @@ it('should throw error if nickname is taken', async () => {
         expect(result.errorCode).toBe(ErrorCode.NICKNAME_ALREADY_TAKEN);
     }
 });
+
+it('q', () => {});
+
+it('should prevent user create nickname race condition', async () => {
+    const nickname = 'hlkroot';
+    const raceCondition = async () => {
+        await Promise.all(
+            new Array(3).fill(0).map(async () => {
+                const reqDto: UserCreateDto = {
+                    fullName: Math.random().toString(36).slice(2, 16),
+                    password: Math.random().toString(36).slice(2, 16),
+                    nickname
+                };
+                try {
+                    await createUser(reqDto);
+                } catch (err) {
+                    const result = <MetaInterface>err.response.data.meta;
+                    expect(result.errorCode).toBe(ErrorCode.RACE_CONDITION);
+                }
+            })
+        );
+    };
+    await raceCondition();
+    const count = await UserMongoModel.count({
+        nickname
+    })
+        .lean()
+        .exec();
+    expect(count).toBe(1);
+});
