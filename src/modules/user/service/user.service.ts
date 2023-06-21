@@ -6,8 +6,7 @@ import { NicknameAlreadyTakenException, RaceConditionException } from '../../../
 import { cacheKeys } from '../../../core/cache';
 import { cacheTTL } from '../../../core/cache';
 import { LockService } from '../../../core/service';
-import { UserCreateAck } from '../controller/ack';
-import { UserCreateDto } from '../controller/dto';
+import { UserCreateAck, UserCreateDto } from '../dto';
 
 @Injectable()
 export class UserService {

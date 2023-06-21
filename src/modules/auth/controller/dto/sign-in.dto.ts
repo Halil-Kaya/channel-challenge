@@ -11,3 +11,7 @@ export class SignInDto {
     @MaxLength(32)
     password: string;
 }
+
+export class SignInAck {
+    accessToken: string;
+}

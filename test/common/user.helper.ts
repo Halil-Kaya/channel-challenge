@@ -1,5 +1,5 @@
 import { testConfig } from '../test-config';
-import { UserCreateDto } from '../../src/modules/user/controller/dto';
+import { UserCreateDto } from '../../src/modules/user/dto';
 import axios from 'axios';
 import { AxiosResponse } from "axios";
 

@@ -1,6 +1,6 @@
 import { createUser } from '../../common/user.helper';
 import { UserMongoModel } from '../../common/db';
-import { UserCreateDto } from '../../../src/modules/user/controller/dto';
+import { UserCreateDto } from '../../../src/modules/user/dto';
 import * as bcrypt from 'bcryptjs';
 import { MetaInterface } from '../../../src/core/interceptor';
 import { ErrorCode } from '../../../src/core/error';
@@ -39,8 +39,6 @@ it('should throw error if nickname is taken', async () => {
         expect(result.errorCode).toBe(ErrorCode.NICKNAME_ALREADY_TAKEN);
     }
 });
-
-it('q', () => {});
 
 it('should prevent user create nickname race condition', async () => {
     const nickname = 'hlkroot';

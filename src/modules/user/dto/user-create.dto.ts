@@ -16,3 +16,7 @@ export class UserCreateDto {
     @MaxLength(20)
     password: string;
 }
+
+export class UserCreateAck {
+
+}
