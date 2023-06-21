@@ -5,5 +5,8 @@ export enum ErrorCode {
     INVALID_CREDENTIALS = 500102,
 
     //401
-    UNAUTHORIZED = 40100
+    UNAUTHORIZED = 40100,
+
+    //429
+    RACE_CONDITION = 42900
 }
