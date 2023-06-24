@@ -6,7 +6,7 @@ import { NicknameAlreadyTakenException, RaceConditionException } from '../../../
 import { cacheKeys } from '../../../core/cache';
 import { cacheTTL } from '../../../core/cache';
 import { LockService } from '../../../core/service';
-import { UserCreateAck, UserCreateDto } from '../dto';
+import { UpdatePasswordDto, UserCreateAck, UserCreateDto } from '../dto';
 
 @Injectable()
 export class UserService {
@@ -32,15 +32,7 @@ export class UserService {
         return;
     }
 
-    findById(userId: string): Promise<User> {
-        return this.userRepository.findById(userId);
-    }
-
-    findByNickname(nickname: string): Promise<User> {
-        return this.userRepository.findByNickname(nickname);
-    }
-
-    async updatePasswrod(userId: string, newPassword: string): Promise<void> {
-        await this.userRepository.updatePassword(userId, newPassword);
+    async updatePasswrod(user: User, updatePasswordDto: UpdatePasswordDto): Promise<void> {
+        await this.userRepository.updatePassword(user._id, updatePasswordDto.newPassword);
     }
 }

@@ -5,6 +5,7 @@ import { UserController } from './controller/user.controller';
 import { UserService, UserInternalService } from './service';
 import { UserCacheRepository, UserMongoRepository, UserRepository } from './repository';
 import { LockService } from '../../core/service';
+
 @Module({
     imports: [MongooseModule.forFeatureAsync([UserFactory])],
     controllers: [UserController],

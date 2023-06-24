@@ -4,11 +4,22 @@ import { UserInternalService } from '../../user/service';
 import { SignInAck, SignInDto } from '../controller/dto';
 import { UnauthorizedException } from '../../../core/error';
 import * as bcrypt from 'bcryptjs';
-import { JwtPayload } from '../../../core/interface';
+import { Environment, JwtPayload, User } from '../../../core/interface';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
-    constructor(private readonly userInternalService: UserInternalService, private readonly jwtService: JwtService) {}
+    constructor(
+        private readonly userInternalService: UserInternalService,
+        private readonly jwtService: JwtService,
+        private readonly configService: ConfigService<Environment>
+    ) {}
+
+    async getUserByToken(token: string): Promise<User> {
+        return this.jwtService.verifyAsync(token, {
+            secret: this.configService.get('JWT_SECRET')
+        });
+    }
 
     async signIn(signInDto: SignInDto): Promise<SignInAck> {
         const { nickname, password } = signInDto;

@@ -1,6 +1,9 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 import { UserService } from '../service';
-import { UserCreateAck, UserCreateDto } from '../dto';
+import { UpdatePasswordAck, UpdatePasswordDto, UserCreateAck, UserCreateDto } from '../dto';
+import { AuthGuard } from '../../../core/guard/auth.guard';
+import { CurrentUser } from '../../../core/decorator';
+import { User } from '../../../core/interface';
 
 @Controller('user')
 export class UserController {
@@ -9,6 +12,16 @@ export class UserController {
     @Post()
     async create(@Body() createUserDto: UserCreateDto): Promise<UserCreateAck> {
         await this.userService.save(createUserDto);
+        return;
+    }
+
+    @UseGuards(AuthGuard)
+    @Post('update-password')
+    async updatePassword(
+        @Body() updatePasswordDto: UpdatePasswordDto,
+        @CurrentUser() user: User
+    ): Promise<UpdatePasswordAck> {
+        await this.userService.updatePasswrod(user, updatePasswordDto);
         return;
     }
 }
