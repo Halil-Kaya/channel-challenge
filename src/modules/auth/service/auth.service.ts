@@ -16,9 +16,14 @@ export class AuthService {
     ) {}
 
     async getUserByToken(token: string): Promise<User> {
-        return this.jwtService.verifyAsync(token, {
+        const userPayload: JwtPayload = await this.jwtService.verifyAsync(token, {
             secret: this.configService.get('JWT_SECRET')
         });
+        const user = this.userInternalService.findByNickname(userPayload.nickname);
+        if (!user) {
+            throw new UnauthorizedException();
+        }
+        return user;
     }
 
     async signIn(signInDto: SignInDto): Promise<SignInAck> {
@@ -31,9 +36,16 @@ export class AuthService {
         if (!isPasswordMatch) {
             throw new UnauthorizedException();
         }
-        const payload: JwtPayload = user;
+        const payload: JwtPayload = {
+            _id: user._id,
+            nickname: user.nickname
+        };
+        const accessToken = await this.jwtService.signAsync(payload, {
+            secret: this.configService.get('JWT_SECRET'),
+            expiresIn: this.configService.get('JWT_EXPIRES')
+        });
         return {
-            accessToken: await this.jwtService.signAsync(payload)
+            accessToken
         };
     }
 }

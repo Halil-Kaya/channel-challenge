@@ -9,4 +9,5 @@ export class UserInternalService {
     findByNickname(nickname: string): Promise<User> {
         return this.userRepository.findByNickname(nickname);
     }
+
 }
