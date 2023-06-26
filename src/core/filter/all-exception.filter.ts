@@ -11,15 +11,17 @@ export class AllExceptionFilter implements ExceptionFilter {
         const request = ctx.getRequest();
         if (!exception.isCustomError) {
             this.logger.error(
-                `RES:[${request.reqId}]:[${request.user?._id}]:[UNHANDLED ERROR]: [${exception?.message}] :-> `,
-                JSON.stringify(exception)
+                `RES:[${request.reqId}]:[${request.user?._id}]:[UNHANDLED ERROR]: [${
+                    exception?.message
+                }] [${JSON.stringify(exception)}] :-> `,
+                exception.stack
             );
             exception = new GeneralServerException();
         } else {
             this.logger.error(
                 `RES:[${request.reqId}]:[${request.user?._id}]:[ERROR:${
                     exception.errorCode
-                }] ${exception.message.toUpperCase()}`
+                }] ${exception.message.toUpperCase()} :-> ${exception.stack}`
             );
         }
         response.status(500).json({
