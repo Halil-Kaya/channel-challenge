@@ -1,28 +1,30 @@
-import { ArgumentsHost, Catch, ExceptionFilter, Logger } from '@nestjs/common';
+import { ArgumentsHost, Catch, ExceptionFilter } from '@nestjs/common';
 import { GeneralServerException } from '../error';
+import { logger } from '../logger/logger';
 
 @Catch()
 export class AllExceptionFilter implements ExceptionFilter {
-    private logger = new Logger(AllExceptionFilter.name);
-
     catch(exception: any, host: ArgumentsHost): any {
         const ctx = host.switchToHttp();
         const response = ctx.getResponse();
         const request = ctx.getRequest();
         if (!exception.isCustomError) {
-            this.logger.error(
-                `RES:[${request.reqId}]:[${request.user?._id}]:[UNHANDLED ERROR]: [${
-                    exception?.message
-                }] [${JSON.stringify(exception)}] :-> `,
-                exception.stack
-            );
+            logger.error({
+                type: 'RES',
+                req: request,
+                respTime: Date.now() - request.reqStartTime,
+                user: request.user,
+                err: exception
+            });
             exception = new GeneralServerException();
         } else {
-            this.logger.error(
-                `RES:[${request.reqId}]:[${request.user?._id}]:[ERROR:${
-                    exception.errorCode
-                }] ${exception.message.toUpperCase()} :-> ${exception.stack}`
-            );
+            logger.error({
+                type: 'RES',
+                req: request,
+                respTime: Date.now() - request.reqStartTime,
+                user: request.user,
+                err: exception
+            });
         }
         response.status(500).json({
             meta: {

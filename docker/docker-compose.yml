@@ -14,9 +14,12 @@ services:
         networks:
             - app-net
         command: './docker/init.sh'
+        environment:
+            - FORCE_COLOR=1
         volumes:
             - './../src:/project/src:ro'
             - './../environments/.env:/project/environments/env:ro'
+            - './../logs:/project/logs'
         depends_on:
             - mongo-db
             - redis-db
