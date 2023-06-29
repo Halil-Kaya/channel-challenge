@@ -5,6 +5,9 @@ import { Environment } from './core/interface';
 import { RedisModule } from '@nestjs-modules/ioredis';
 import { AuthModule } from './modules/auth/auth.module';
 import { UserModule } from './modules/user/user.module';
+import { CryptoService } from './core/service';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { TransformInterceptor } from './core/interceptor';
 
 @Module({
     imports: [
@@ -33,6 +36,12 @@ import { UserModule } from './modules/user/user.module';
         UserModule
     ],
     controllers: [],
-    providers: []
+    providers: [
+        {
+            provide: APP_INTERCEPTOR,
+            useClass: TransformInterceptor
+        },
+        CryptoService
+    ]
 })
 export class AppModule {}

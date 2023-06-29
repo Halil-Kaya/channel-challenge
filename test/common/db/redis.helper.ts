@@ -8,7 +8,9 @@ const client = createClient({
 client.on('error', (err) => console.log('Redis Client Error', err));
 
 export const connectRedis = async (): Promise<void> => {
-    await client.connect();
+    if (!client.isOpen) {
+        await client.connect();
+    }
     await resetCache();
 };
 

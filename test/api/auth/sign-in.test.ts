@@ -11,8 +11,8 @@ it('Should sign-in user', async () => {
         password: '12345678'
     };
     await createUser(dto);
-    const { data } = await signIn({ nickname: dto.nickname, password: dto.password });
-    const { accessToken } = data.result;
+    const { result } = await signIn({ nickname: dto.nickname, password: dto.password });
+    const { accessToken } = result;
     expect(accessToken).toBeDefined();
 });
 

@@ -1,11 +1,11 @@
 import { testConfig } from '../test-config';
-import { UserCreateDto } from '../../src/modules/user/dto';
+import { UserCreateAck, UserCreateDto } from '../../src/modules/user/dto';
 import axios from 'axios';
-import { AxiosResponse } from "axios";
+import { decrypt, encrypt } from './crypto.helper';
 
 const uri = testConfig.baseUri + 'user/';
 
-export const createUser = (dto?: UserCreateDto): Promise<AxiosResponse<void>> => {
+export const createUser = async (dto?: UserCreateDto): Promise<UserCreateAck> => {
     if (!dto) {
         dto = {
             fullName: '#test-user',
@@ -13,5 +13,6 @@ export const createUser = (dto?: UserCreateDto): Promise<AxiosResponse<void>> =>
             password: 'passw@rd'
         };
     }
-    return axios.post(uri, dto);
+    const { data } = await axios.post(uri, encrypt(dto));
+    return decrypt(data);
 };

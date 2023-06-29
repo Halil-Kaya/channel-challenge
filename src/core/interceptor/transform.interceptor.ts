@@ -2,6 +2,8 @@ import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nes
 import { map, Observable } from 'rxjs';
 import { maskHelper } from '../helper';
 import { logger } from '../logger/logger';
+import { CryptoService } from '../service';
+import { UnauthorizedException } from '../error';
 
 export interface MetaInterface {
     headers: any;
@@ -19,38 +21,45 @@ export interface Response<T> {
 
 @Injectable()
 export class TransformInterceptor implements NestInterceptor {
-    intercept(context: ExecutionContext, next: CallHandler): Observable<Response<any>> {
-        const request = context.switchToHttp().getRequest();
-        const { body, headers, params, status } = request;
-        request.reqId = (Math.random() + 1).toString(36).substring(2);
-        logger.info({
-            type: 'REQ',
-            req: request,
-            body: maskHelper(body, ['password']),
-            user: request.user
-        });
-        request.reqStartTime = Date.now();
-        return next.handle().pipe(
-            map((data) => {
-                const res = {
-                    meta: {
-                        headers: headers,
-                        params: params,
-                        status: status,
-                        timestamp: new Date(),
-                        requestId: request.id
-                    },
-                    result: data
-                };
-                logger.info({
-                    type: 'RES',
-                    req: request,
-                    body: maskHelper(res, ['password']),
-                    respTime: Date.now() - request.reqStartTime,
-                    user: request.user
-                });
-                return res;
-            })
-        );
+    constructor(private readonly cryptoService: CryptoService) {}
+
+    intercept(context: ExecutionContext, next: CallHandler): Observable<string> {
+        try {
+            const request = context.switchToHttp().getRequest();
+            const { body, headers, params, status } = request;
+            request.body = this.cryptoService.decrypt(body.data);
+            request.reqId = this.cryptoService.generateReqId();
+            logger.info({
+                type: 'REQ',
+                req: request,
+                body: maskHelper(request.body, ['password', 'accessToken']),
+                user: request.user
+            });
+            request.reqStartTime = Date.now();
+            return next.handle().pipe(
+                map((data) => {
+                    const res = {
+                        meta: {
+                            headers: headers,
+                            params: params,
+                            status: status,
+                            timestamp: new Date(),
+                            requestId: request.id
+                        },
+                        result: data
+                    };
+                    logger.info({
+                        type: 'RES',
+                        req: request,
+                        body: maskHelper(res, ['password', 'accessToken']),
+                        respTime: Date.now() - request.reqStartTime,
+                        user: request.user
+                    });
+                    return this.cryptoService.encrypt(res);
+                })
+            );
+        } catch (err) {
+            throw new UnauthorizedException();
+        }
     }
 }

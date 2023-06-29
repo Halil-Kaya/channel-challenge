@@ -6,4 +6,5 @@ export interface Environment {
     JWT_SECRET: string;
     JWT_EXPIRES: string;
     JWT_ALGORITHM: string;
+    CRYPTO_PASSWORD: string;
 }

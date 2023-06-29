@@ -5,5 +5,6 @@ export const testConfig = {
         host: 'localhost',
         port: 6378
     },
-    baseUri: 'http://localhost:3050/'
+    baseUri: 'http://localhost:3050/',
+    cryptoPassword: 'd3fe472db2c08ea41df50838c898fb4a0337a24c855424751a71d46a3ca59314'
 };

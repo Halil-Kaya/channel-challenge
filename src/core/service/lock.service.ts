@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import Redlock from 'redlock';
 import { InjectRedis } from '@nestjs-modules/ioredis';
 import Redis from 'ioredis';
-import { cacheTTL } from '../cache/cache-ttl';
+import { cacheTTL } from "../cache";
 
 @Injectable()
 export class LockService {
