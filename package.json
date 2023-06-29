@@ -29,7 +29,7 @@
         "@nestjs/mongoose": "9.2.1",
         "@nestjs/platform-express": "^9.0.0",
         "@nestjs/platform-socket.io": "^10.0.1",
-        "@nestjs/swagger": "^7.0.10",
+        "@nestjs/swagger": "^7.0.11",
         "@nestjs/websockets": "^10.0.1",
         "axios": "^1.4.0",
         "bcryptjs": "^2.4.3",
