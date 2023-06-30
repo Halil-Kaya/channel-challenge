@@ -7,10 +7,39 @@ services:
             context: ..
             dockerfile: docker/Dockerfile
 
-    channel-challenge:
-        image: channel-challenge-base-node
+    nginx:
+        image: nginx:alpine
+        volumes:
+            - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+        links:
+            - channel-challenge-1
+            - channel-challenge-2
         ports:
-            - 3050:3050
+            - '3050:80'
+        networks:
+            - app-net
+
+    channel-challenge-1:
+        image: channel-challenge-base-node
+        expose:
+            - '3000'
+        networks:
+            - app-net
+        command: './docker/init.sh'
+        environment:
+            - FORCE_COLOR=1
+        volumes:
+            - './../src:/project/src:ro'
+            - './../environments/.env:/project/environments/env:ro'
+            - './../logs:/project/logs'
+        depends_on:
+            - mongo-db
+            - redis-db
+
+    channel-challenge-2:
+        image: channel-challenge-base-node
+        expose:
+            - '3000'
         networks:
             - app-net
         command: './docker/init.sh'

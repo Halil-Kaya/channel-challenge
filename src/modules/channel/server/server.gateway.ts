@@ -10,7 +10,12 @@ import { CryptoService } from '../../../core/service';
 import { logger } from '../../../core/logger/logger';
 import { AuthProvider } from './provider/auth.provider';
 
-@WebSocketGateway({})
+@WebSocketGateway({
+    transports: ['websocket'],
+    cors: {
+        origin: '*'
+    }
+})
 export class ServerGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
     @WebSocketServer()
     private readonly server: Server;

@@ -3,6 +3,7 @@ import { testConfig } from '../test-config';
 import { encrypt } from './crypto.helper';
 
 const opts = {
+    transports: ['websocket'],
     reconnection: true,
     autoConnect: false
 };

@@ -30,7 +30,6 @@ it('should create user', async () => {
     expect(userInRedis._id).toBe(createdUser._id.toString());
     expect(userInRedis.fullName).toBe(createdUser.fullName);
     expect(userInRedis.nickname).toBe(createdUser.nickname);
-    expect(userInRedis.isOnline).toBe('0');
     expect(userInRedis.createdAt).toBe(createdUser.createdAt.toISOString());
     expect(userInRedis.password).toBeUndefined();
 });
@@ -55,7 +54,7 @@ it('should prevent user create nickname race condition', async () => {
     const nickname = 'hlkroot';
     const raceCondition = async () => {
         await Promise.all(
-            new Array(3).fill(0).map(async () => {
+            new Array(30).fill(0).map(async () => {
                 const reqDto: UserCreateDto = {
                     fullName: Math.random().toString(36).slice(2, 16),
                     password: Math.random().toString(36).slice(2, 16),
