@@ -6,21 +6,35 @@ import {
     WebSocketServer
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { CryptoService } from '../../../core/service';
+import { logger } from '../../../core/logger/logger';
+import { AuthProvider } from './provider/auth.provider';
 
 @WebSocketGateway({})
 export class ServerGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
     @WebSocketServer()
     private readonly server: Server;
 
-    constructor() {}
+    constructor(private readonly authProvider: AuthProvider, private readonly cryptoService: CryptoService) {}
 
     afterInit(server: Server) {
-        console.log('afterInit calisti');
+        server.use(async (socket: Socket, next) => {
+            try {
+                const { token } = <{ token: string }>this.cryptoService.decrypt(socket.handshake?.query?.data + '');
+                socket.data.user = await this.authProvider.auth(token);
+                next();
+            } catch (err) {
+                logger.warn({
+                    event: 'socket-auth'
+                });
+                next(err);
+            }
+        });
     }
-    handleConnection(socket: Socket) {
-        console.log('baglandi');
+    async handleConnection(socket: Socket) {
+        console.log('connected -> ', socket.data.user);
     }
-    handleDisconnect(socket: Socket) {
-        console.log('baglanti koptu');
+    async handleDisconnect(socket: Socket) {
+        await this.authProvider.disconnect(socket.data.user);
     }
 }

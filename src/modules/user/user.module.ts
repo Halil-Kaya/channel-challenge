@@ -2,8 +2,8 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UserFactory } from './model/user.model';
 import { UserController } from './controller/user.controller';
-import { UserService, UserInternalService } from './service';
-import { UserCacheRepository, UserMongoRepository, UserRepository } from './repository';
+import { UserService, UserInternalService, UserSessionInternalService } from './service';
+import { UserCacheRepository, UserMongoRepository, UserRepository, UserSessionCacheRepository } from './repository';
 import { LockService } from '../../core/service';
 
 @Module({
@@ -15,8 +15,10 @@ import { LockService } from '../../core/service';
         UserInternalService,
         UserMongoRepository,
         UserCacheRepository,
-        LockService
+        LockService,
+        UserSessionCacheRepository,
+        UserSessionInternalService
     ],
-    exports: [UserInternalService]
+    exports: [UserInternalService, UserSessionInternalService]
 })
 export class UserModule {}

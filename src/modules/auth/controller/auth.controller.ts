@@ -1,6 +1,6 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { AuthService } from '../service/auth.service';
-import { SignInAck, SignInDto } from './dto';
+import { SignInAck, SignInDto } from '../dto';
 import { ApiException, ApiResponseSchema } from '../../../core/decorator';
 import { UnauthorizedException } from '../../../core/error';
 

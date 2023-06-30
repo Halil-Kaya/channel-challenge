@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserInternalService } from '../../user/service';
-import { SignInAck, SignInDto } from '../controller/dto';
+import { SignInAck, SignInDto } from '../dto';
 import { UnauthorizedException } from '../../../core/error';
 import * as bcrypt from 'bcryptjs';
 import { Environment, JwtPayload, User } from '../../../core/interface';

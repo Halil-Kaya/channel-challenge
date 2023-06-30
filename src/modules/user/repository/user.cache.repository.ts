@@ -16,10 +16,7 @@ export class UserCacheRepository {
             this.redis.hset(cacheKey, serializedUser),
             this.redis.hset(cacheKeys.nickname_map, user.nickname, user._id)
         ]);
-        await Promise.all([
-            this.redis.expire(cacheKey, cacheTTL.user.user),
-            this.redis.expire(cacheKeys.nickname_map, cacheTTL.user.nickname)
-        ]);
+        await this.redis.pexpire(cacheKey, cacheTTL.user.user);
     }
 
     async getUserById(userId: string): Promise<Omit<User, 'password'>> {

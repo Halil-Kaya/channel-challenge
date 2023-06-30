@@ -1,16 +1,18 @@
 import { Injectable } from '@nestjs/common';
-import { UserSessionRepository } from '../repository';
+import { UserSessionCacheRepository } from '../repository';
 import { User } from '../../../core/interface';
 
 @Injectable()
 export class UserSessionInternalService {
-    constructor(private readonly userSessionRepository: UserSessionRepository) {}
+    constructor(private readonly userSessionCacheRepository: UserSessionCacheRepository) {}
 
-    save(user: User) {}
+    save(user: Omit<User, 'password'>): Promise<void> {
+        return this.userSessionCacheRepository.save(user);
+    }
 
-    deleteByUserId() {}
+    deleteCache(userId: string): Promise<void> {
+        return this.userSessionCacheRepository.deleteCache(userId);
+    }
 
     findOnlineUserIds() {}
-
-    getByUserId() {}
 }

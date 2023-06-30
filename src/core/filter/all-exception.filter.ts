@@ -18,7 +18,7 @@ export class AllExceptionFilter implements ExceptionFilter {
             });
             exception = new GeneralServerException();
         } else {
-            logger.error({
+            logger.warn({
                 type: 'RES',
                 req: request,
                 respTime: Date.now() - request.reqStartTime,
