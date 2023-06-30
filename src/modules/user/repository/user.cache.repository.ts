@@ -3,14 +3,13 @@ import { User } from '../../../core/interface';
 import { InjectRedis } from '@nestjs-modules/ioredis';
 import Redis from 'ioredis';
 import { cacheKeys, cacheTTL } from '../../../core/cache';
-
-type SerializedUser = Record<keyof User, string>;
+import { SerializedUser } from '../../../core/interface';
 
 @Injectable()
 export class UserCacheRepository {
     constructor(@InjectRedis() private readonly redis: Redis) {}
 
-    async save(user: User): Promise<void> {
+    async save(user: Omit<User, 'password'>): Promise<void> {
         const cacheKey = cacheKeys.user(user._id);
         const serializedUser: SerializedUser = this.serializeUser(user);
         await Promise.all([
@@ -23,16 +22,16 @@ export class UserCacheRepository {
         ]);
     }
 
-    async getUserById(userId: string): Promise<User> {
+    async getUserById(userId: string): Promise<Omit<User, 'password'>> {
         const cacheKey = cacheKeys.user(userId);
-        const userCache = <SerializedUser>await this.redis.hgetall(cacheKey);
+        const userCache: SerializedUser = <SerializedUser>await this.redis.hgetall(cacheKey);
         if (!userCache) {
             return null;
         }
         return this.deserializeUser(userCache);
     }
 
-    async getUserByNickname(nickname: string): Promise<User> {
+    async getUserByNickname(nickname: string): Promise<Omit<User, 'password'>> {
         const userId = await this.getUserIdByNickname(nickname);
         if (userId == null) {
             return;
@@ -53,23 +52,23 @@ export class UserCacheRepository {
         await this.redis.del(cacheKey);
     }
 
-    serializeUser(user: User): SerializedUser {
+    serializeUser(user: Omit<User, 'password'>): SerializedUser {
         return {
             _id: user._id.toString(),
             fullName: user.fullName,
             nickname: user.nickname,
-            password: user.password,
+            isOnline: user.isOnline ? '1' : '0',
             createdAt: user.createdAt.toISOString()
         };
     }
 
-    deserializeUser(serializedUser: SerializedUser): User {
+    deserializeUser(serializedUser: SerializedUser): Omit<User, 'password'> {
         return {
             ...serializedUser,
             _id: serializedUser._id,
             fullName: serializedUser.fullName,
             nickname: serializedUser.nickname,
-            password: serializedUser.password,
+            isOnline: serializedUser.isOnline === '1',
             createdAt: new Date(serializedUser.createdAt)
         };
     }

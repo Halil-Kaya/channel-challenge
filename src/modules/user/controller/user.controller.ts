@@ -3,9 +3,9 @@ import { UserService } from '../service';
 import { UpdatePasswordAck, UpdatePasswordDto, UserCreateAck, UserCreateDto } from '../dto';
 import { AuthGuard } from '../../../core/guard/auth.guard';
 import { ApiException, ApiResponseSchema, CurrentUser } from '../../../core/decorator';
-import { User } from '../../../core/interface';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { NicknameAlreadyTakenException, RaceConditionException } from '../../../core/error';
+import { Client } from '../../../core/interface/client.interface';
 
 @Controller('user')
 export class UserController {
@@ -25,9 +25,9 @@ export class UserController {
     @Post('update-password')
     async updatePassword(
         @Body() updatePasswordDto: UpdatePasswordDto,
-        @CurrentUser() user: User
+        @CurrentUser() client: Client
     ): Promise<UpdatePasswordAck> {
-        await this.userService.updatePasswrod(user, updatePasswordDto);
+        await this.userService.updatePasswrod(client, updatePasswordDto);
         return;
     }
 }

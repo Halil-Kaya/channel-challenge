@@ -1,6 +1,6 @@
 import { Document, Schema as MongooseSchema, Types } from 'mongoose';
 import { AsyncModelFactory, Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { User } from "../../../core/interface";
+import { User } from '../../../core/interface';
 import { hashSync } from 'bcryptjs';
 
 export type UserDocument = UserModel & Document;
@@ -18,8 +18,11 @@ export class UserModel implements User {
     @Prop({ type: String, unique: true, required: true })
     nickname: string;
 
-    @Prop({ type: String, minlength: 4, maxlength: 24, required: true })
+    @Prop({ type: String, select: false, minlength: 4, maxlength: 24, required: true })
     password: string;
+
+    @Prop({ type: Boolean, default: false, required: false })
+    isOnline: boolean;
 
     @Prop({ type: Date, default: Date.now, required: false })
     createdAt: Date;

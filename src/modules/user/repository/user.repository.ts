@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { UserMongoRepository } from './user.mongo.repository';
 import { UserCacheRepository } from './user.cache.repository';
-import { User } from "../../../core/interface";
+import { User } from '../../../core/interface';
 import { ClientSession } from 'mongoose';
 
 @Injectable()
@@ -11,13 +11,13 @@ export class UserRepository {
         private readonly userCacheRepository: UserCacheRepository
     ) {}
 
-    async save(user: Omit<User, '_id' | 'createdAt'>, session?: ClientSession) {
+    async save(user: Omit<User, '_id' | 'isOnline' | 'createdAt'>, session?: ClientSession) {
         const createdUser = await this.userMongoRepository.save(user, session);
         await this.userCacheRepository.save(createdUser);
         return createdUser;
     }
 
-    async findById(userId: string): Promise<User> {
+    async findById(userId: string): Promise<Omit<User, 'password'>> {
         const userCache = await this.userCacheRepository.getUserById(userId);
         if (userCache) {
             return userCache;
@@ -30,7 +30,7 @@ export class UserRepository {
         return null;
     }
 
-    async findByNickname(nickname: string): Promise<User> {
+    async findByNickname(nickname: string): Promise<Omit<User, 'password'>> {
         const userCache = await this.userCacheRepository.getUserByNickname(nickname);
         if (userCache) {
             return userCache;
@@ -48,7 +48,7 @@ export class UserRepository {
         await this.userCacheRepository.deleteCache(userId);
     }
 
-    async saveUserToRedis(): Promise<void> {
-        await this.userCacheRepository;
+    async findByNicknameInMongo(nickname: string): Promise<User> {
+        return this.userMongoRepository.findByNicknameForAuth(nickname);
     }
 }

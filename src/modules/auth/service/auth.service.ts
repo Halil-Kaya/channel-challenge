@@ -15,7 +15,7 @@ export class AuthService {
         private readonly configService: ConfigService<Environment>
     ) {}
 
-    async getUserByToken(token: string): Promise<User> {
+    async getUserByToken(token: string): Promise<Omit<User, 'password'>> {
         const userPayload: JwtPayload = await this.jwtService.verifyAsync(token, {
             secret: this.configService.get('JWT_SECRET')
         });
@@ -28,7 +28,7 @@ export class AuthService {
 
     async signIn(signInDto: SignInDto): Promise<SignInAck> {
         const { nickname, password } = signInDto;
-        const user = await this.userInternalService.findByNickname(nickname);
+        const user = await this.userInternalService.findByNicknameForAuth(nickname);
         if (!user) {
             throw new UnauthorizedException();
         }

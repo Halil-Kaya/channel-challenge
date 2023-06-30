@@ -6,8 +6,11 @@ import { User } from '../../../core/interface';
 export class UserInternalService {
     constructor(private readonly userRepository: UserRepository) {}
 
-    findByNickname(nickname: string): Promise<User> {
+    findByNickname(nickname: string): Promise<Omit<User, 'password'>> {
         return this.userRepository.findByNickname(nickname);
     }
 
+    findByNicknameForAuth(nickname: string): Promise<User> {
+        return this.userRepository.findByNicknameInMongo(nickname);
+    }
 }

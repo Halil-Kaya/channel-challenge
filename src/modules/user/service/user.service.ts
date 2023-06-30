@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { UserRepository } from '../repository';
-import { User } from '../../../core/interface';
 import { ClientSession } from 'mongoose';
 import { NicknameAlreadyTakenException, RaceConditionException } from '../../../core/error';
 import { cacheKeys } from '../../../core/cache';
 import { cacheTTL } from '../../../core/cache';
 import { LockService } from '../../../core/service';
 import { UpdatePasswordDto, UserCreateAck, UserCreateDto } from '../dto';
+import { Client } from '../../../core/interface/client.interface';
 
 @Injectable()
 export class UserService {
@@ -32,7 +32,7 @@ export class UserService {
         return;
     }
 
-    async updatePasswrod(user: User, updatePasswordDto: UpdatePasswordDto): Promise<void> {
-        await this.userRepository.updatePassword(user._id, updatePasswordDto.newPassword);
+    async updatePasswrod(client: Client, updatePasswordDto: UpdatePasswordDto): Promise<void> {
+        await this.userRepository.updatePassword(client._id, updatePasswordDto.newPassword);
     }
 }

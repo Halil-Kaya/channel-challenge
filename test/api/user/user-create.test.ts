@@ -16,10 +16,12 @@ it('should create user', async () => {
     const createdUser = await UserMongoModel.findOne({
         nickname: dto.nickname
     })
+        .select('+password')
         .lean()
         .exec();
     expect(createdUser.fullName).toBe(dto.fullName);
     expect(createdUser.nickname).toBe(dto.nickname);
+    expect(createdUser.isOnline).toBe(false);
     expect(createdUser.createdAt).toBeDefined();
     const isPasswordMatch = bcrypt.compare(createdUser.password, dto.password);
     expect(isPasswordMatch).toBeTruthy();
@@ -29,7 +31,9 @@ it('should create user', async () => {
     expect(userInRedis._id).toBe(createdUser._id.toString());
     expect(userInRedis.fullName).toBe(createdUser.fullName);
     expect(userInRedis.nickname).toBe(createdUser.nickname);
+    expect(userInRedis.isOnline).toBe('0');
     expect(userInRedis.createdAt).toBe(createdUser.createdAt.toISOString());
+    expect(userInRedis.password).toBeUndefined();
 });
 
 it('should throw error if nickname is taken', async () => {

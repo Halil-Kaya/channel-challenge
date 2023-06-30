@@ -21,6 +21,7 @@
         "test:e2e": "jest --config ./test/jest-e2e.json"
     },
     "dependencies": {
+        "@golevelup/nestjs-discovery": "^3.0.0",
         "@nestjs-modules/ioredis": "^1.0.1",
         "@nestjs/common": "^9.0.0",
         "@nestjs/config": "^3.0.0",
@@ -28,9 +29,9 @@
         "@nestjs/jwt": "^10.1.0",
         "@nestjs/mongoose": "9.2.1",
         "@nestjs/platform-express": "^9.0.0",
-        "@nestjs/platform-socket.io": "^10.0.1",
+        "@nestjs/platform-socket.io": "^10.0.4",
         "@nestjs/swagger": "^7.0.11",
-        "@nestjs/websockets": "^10.0.1",
+        "@nestjs/websockets": "^10.0.4",
         "axios": "^1.4.0",
         "bcryptjs": "^2.4.3",
         "chalk": "4.1.2",

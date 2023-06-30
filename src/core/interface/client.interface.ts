@@ -1,8 +1,7 @@
-export interface User {
+export interface Client {
     _id: string;
     fullName: string;
     nickname: string;
-    password: string;
     isOnline: boolean;
     createdAt: Date;
 }

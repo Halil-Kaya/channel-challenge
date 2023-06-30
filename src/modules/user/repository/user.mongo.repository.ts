@@ -2,24 +2,24 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { UserDocument, UserModel } from '../model/user.model';
 import { ClientSession, Model } from 'mongoose';
-import { User } from "../../../core/interface";
+import { User } from '../../../core/interface';
 
 @Injectable()
 export class UserMongoRepository {
     constructor(@InjectModel(UserModel.name) private readonly userModel: Model<UserDocument>) {}
 
-    save(user: Omit<User, '_id' | 'createdAt'>, session?: ClientSession) {
+    save(user: Omit<User, '_id' | 'isOnline' | 'createdAt'>, session?: ClientSession) {
         const newUser = new this.userModel({
             ...user
         });
         return newUser.save({ session });
     }
 
-    findById(_id: string): Promise<User> {
+    findById(_id: string): Promise<Omit<User, 'password'>> {
         return this.userModel.findById(_id).lean().exec();
     }
 
-    findByNickname(nickname: string): Promise<User> {
+    findByNickname(nickname: string): Promise<Omit<User, 'password'>> {
         return this.userModel
             .findOne({
                 nickname
@@ -28,7 +28,17 @@ export class UserMongoRepository {
             .exec();
     }
 
-    updatePassword(userId: string, newPassword, session?: ClientSession): Promise<UserDocument> {
+    findByNicknameForAuth(nickname: string): Promise<User> {
+        return this.userModel
+            .findOne({
+                nickname
+            })
+            .select('+password')
+            .lean()
+            .exec();
+    }
+
+    updatePassword(userId: string, newPassword, session?: ClientSession): Promise<Omit<User, 'password'>> {
         return this.userModel
             .findOneAndUpdate(
                 {
