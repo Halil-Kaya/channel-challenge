@@ -15,7 +15,6 @@ export class UserSessionCacheRepository {
             fullName: user.fullName,
             nickname: user.nickname,
             password: user.password,
-            isOnline: user.isOnline ? '1' : '0',
             createdAt: user.createdAt.toISOString()
         };
     }
@@ -27,7 +26,6 @@ export class UserSessionCacheRepository {
             fullName: serializedUser.fullName,
             nickname: serializedUser.nickname,
             password: serializedUser.password,
-            isOnline: serializedUser.isOnline === '1',
             createdAt: new Date(serializedUser.createdAt)
         };
     }

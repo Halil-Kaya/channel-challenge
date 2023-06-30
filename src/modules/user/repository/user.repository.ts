@@ -11,7 +11,7 @@ export class UserRepository {
         private readonly userCacheRepository: UserCacheRepository
     ) {}
 
-    async save(user: Omit<User, '_id' | 'isOnline' | 'createdAt'>, session?: ClientSession) {
+    async save(user: Omit<User, '_id' | 'isOnline' | 'createdAt'>, session?: ClientSession): Promise<User> {
         const createdUser = await this.userMongoRepository.save(user, session);
         await this.userCacheRepository.save(createdUser);
         return createdUser;

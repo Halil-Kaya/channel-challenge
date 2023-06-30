@@ -8,7 +8,7 @@ import { User } from '../../../core/interface';
 export class UserMongoRepository {
     constructor(@InjectModel(UserModel.name) private readonly userModel: Model<UserDocument>) {}
 
-    save(user: Omit<User, '_id' | 'isOnline' | 'createdAt'>, session?: ClientSession) {
+    save(user: Omit<User, '_id' | 'createdAt'>, session?: ClientSession) {
         const newUser = new this.userModel({
             ...user
         });

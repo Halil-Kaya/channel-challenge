@@ -57,7 +57,6 @@ export class UserCacheRepository {
             _id: user._id.toString(),
             fullName: user.fullName,
             nickname: user.nickname,
-            isOnline: user.isOnline ? '1' : '0',
             createdAt: user.createdAt.toISOString()
         };
     }
@@ -68,7 +67,6 @@ export class UserCacheRepository {
             _id: serializedUser._id,
             fullName: serializedUser.fullName,
             nickname: serializedUser.nickname,
-            isOnline: serializedUser.isOnline === '1',
             createdAt: new Date(serializedUser.createdAt)
         };
     }

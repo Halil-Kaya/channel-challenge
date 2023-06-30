@@ -13,4 +13,12 @@ export class UserInternalService {
     findByNicknameForAuth(nickname: string): Promise<User> {
         return this.userRepository.findByNicknameInMongo(nickname);
     }
+
+    createFakeUser(): Promise<User> {
+        return this.userRepository.save({
+            nickname: Math.random().toString(36).slice(2, 16),
+            fullName: Math.random().toString(36).slice(2, 16),
+            password: Math.random().toString(36).slice(2, 16)
+        });
+    }
 }

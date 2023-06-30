@@ -21,9 +21,6 @@ export class UserModel implements User {
     @Prop({ type: String, select: false, minlength: 4, maxlength: 24, required: true })
     password: string;
 
-    @Prop({ type: Boolean, default: false, required: false })
-    isOnline: boolean;
-
     @Prop({ type: Date, default: Date.now, required: false })
     createdAt: Date;
 }

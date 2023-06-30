@@ -3,6 +3,5 @@ export interface User {
     fullName: string;
     nickname: string;
     password: string;
-    isOnline: boolean;
     createdAt: Date;
 }

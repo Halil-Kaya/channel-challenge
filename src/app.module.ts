@@ -8,6 +8,8 @@ import { UserModule } from './modules/user/user.module';
 import { CryptoService } from './core/service';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { TransformInterceptor } from './core/interceptor';
+import { DevModule } from './modules/dev/dev.module';
+import { ChannelModule } from './modules/channel/channel.model';
 
 @Module({
     imports: [
@@ -33,7 +35,9 @@ import { TransformInterceptor } from './core/interceptor';
             inject: [ConfigService]
         }),
         AuthModule,
-        UserModule
+        UserModule,
+        ChannelModule,
+        DevModule
     ],
     controllers: [],
     providers: [

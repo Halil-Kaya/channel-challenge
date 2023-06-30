@@ -21,7 +21,6 @@ it('should create user', async () => {
         .exec();
     expect(createdUser.fullName).toBe(dto.fullName);
     expect(createdUser.nickname).toBe(dto.nickname);
-    expect(createdUser.isOnline).toBe(false);
     expect(createdUser.createdAt).toBeDefined();
     const isPasswordMatch = bcrypt.compare(createdUser.password, dto.password);
     expect(isPasswordMatch).toBeTruthy();
