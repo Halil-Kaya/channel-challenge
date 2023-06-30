@@ -11,6 +11,7 @@ it('Should user connect and disconnect socket', async () => {
     const sessionInRedis = await redis.hGet(cacheKeys.session_user, A.user._id);
     expect(sessionInRedis).toBe(A.user.nickname);
     await A.disconnect();
+    await sleep(1000);
     const exist = await redis.hExists(cacheKeys.session_user, A.user._id);
     expect(exist).toBe(false);
 });
