@@ -12,7 +12,14 @@ const consoleLogFormat = winston.format.combine(
                 `[${logMessage.type}] [${logMessage.reqId}] [${logMessage.userId + '|' + logMessage.userNickname}] [${
                     logMessage.event
                 }]: ${chalk.yellow(logMessage.respTime ? logMessage.respTime + 'ms' : '')}`
-            )} ${chalk.gray(JSON.stringify(logMessage.body))}`;
+            )} ${chalk.gray(
+                JSON.stringify({
+                    body: logMessage.body,
+                    meta: logMessage.meta,
+                    err: logMessage.err,
+                    method: logMessage.method
+                })
+            )}`;
         }
         if (level == 'error') {
             return `[${timestamp}] ${chalk.red(level.toUpperCase())}: ${chalk.red(
@@ -21,20 +28,41 @@ const consoleLogFormat = winston.format.combine(
                 }] [ERROR:${logMessage.err?.errorCode || ''}] ${logMessage.err?.message?.toUpperCase()}: ${chalk.yellow(
                     logMessage.respTime ? logMessage.respTime + 'ms' : ''
                 )} `
-            )} ${chalk.gray(JSON.stringify(logMessage.err || logMessage.body))} ${logMessage.err?.stack}`;
+            )} ${chalk.gray(
+                JSON.stringify({
+                    body: logMessage.body,
+                    meta: logMessage.meta,
+                    err: logMessage.err,
+                    method: logMessage.method
+                })
+            )} ${logMessage.err?.stack}`;
         }
         if (level == 'warn') {
             return `[${timestamp}] ${chalk.yellow(level.toUpperCase())}: ${chalk.cyan(
                 `[${logMessage.type}] [${logMessage.reqId}] [${logMessage.userId + '|' + logMessage.userNickname}] [${
                     logMessage.event
                 }]: ${chalk.yellow(logMessage.respTime ? logMessage.respTime + 'ms' : '')}`
-            )} ${chalk.gray(JSON.stringify(logMessage.body))}`;
+            )} ${chalk.gray(
+                JSON.stringify({
+                    body: logMessage.body,
+                    meta: logMessage.meta,
+                    err: logMessage.err,
+                    method: logMessage.method
+                })
+            )}`;
         }
         return `[${timestamp}] ${chalk.green(level.toUpperCase())}: ${chalk.cyan(
             `[${logMessage.type}] [${logMessage.reqId}] [${logMessage.userId + '|' + logMessage.userNickname}] [${
                 logMessage.event
             }]: ${chalk.yellow(logMessage.respTime ? logMessage.respTime + 'ms' : '')}`
-        )} ${chalk.gray(JSON.stringify(logMessage.body))}`;
+        )} ${chalk.gray(
+            JSON.stringify({
+                body: logMessage.body,
+                meta: logMessage.meta,
+                err: logMessage.err,
+                method: logMessage.method
+            })
+        )}`;
     })
 );
 

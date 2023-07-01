@@ -25,8 +25,16 @@ export class ServerGateway implements OnGatewayInit, OnGatewayConnection, OnGate
     afterInit(server: Server) {
         server.use(async (socket: Socket, next) => {
             try {
+                const startTime = Date.now();
                 const { token } = <{ token: string }>this.cryptoService.decrypt(socket.handshake?.query?.data + '');
                 socket.data.user = await this.authProvider.auth(token);
+                logger.info({
+                    reqId: socket.id,
+                    user: socket.data.user,
+                    event: 'user_connection',
+                    respTime: Date.now() - startTime,
+                    method: 'SOCKET'
+                });
                 next();
             } catch (err) {
                 logger.warn({
@@ -36,9 +44,7 @@ export class ServerGateway implements OnGatewayInit, OnGatewayConnection, OnGate
             }
         });
     }
-    async handleConnection(socket: Socket) {
-        console.log('connected -> ', socket.data.user);
-    }
+    async handleConnection(socket: Socket) {}
     async handleDisconnect(socket: Socket) {
         await this.authProvider.disconnect(socket.data.user);
     }
