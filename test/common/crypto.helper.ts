@@ -10,6 +10,9 @@ export function encrypt(data: object): { data: string } {
 }
 
 export function decrypt(encryptedData: string): any {
+    if (encryptedData == null) {
+        return null;
+    }
     const decipher = createDecipheriv(encryptionMethod, Buffer.from(key, 'hex'), Buffer.alloc(0).toString('utf8'));
     return JSON.parse(decipher.update(encryptedData, 'base64', 'utf8') + decipher.final('utf8'));
 }
