@@ -11,27 +11,29 @@ const consoleLogFormat = winston.format.combine(
             return `[${timestamp}] ${chalk.green(level.toUpperCase())}: ${chalk.cyan(
                 `[${logMessage.type}] [${logMessage.reqId}] [${logMessage.userId + '|' + logMessage.userNickname}] [${
                     logMessage.event
-                }]: `
+                }]: ${chalk.yellow(logMessage.respTime ? logMessage.respTime + 'ms' : '')}`
             )} ${chalk.gray(JSON.stringify(logMessage.body))}`;
         }
         if (level == 'error') {
             return `[${timestamp}] ${chalk.red(level.toUpperCase())}: ${chalk.red(
                 `[${logMessage.type}] [${logMessage.reqId}] [${logMessage.userId + '|' + logMessage.userNickname}] [${
                     logMessage.event
-                }] [ERROR:${logMessage.err?.errorCode || ''}] ${logMessage.err?.message?.toUpperCase()}: `
+                }] [ERROR:${logMessage.err?.errorCode || ''}] ${logMessage.err?.message?.toUpperCase()}: ${chalk.yellow(
+                    logMessage.respTime ? logMessage.respTime + 'ms' : ''
+                )} `
             )} ${chalk.gray(JSON.stringify(logMessage.err || logMessage.body))} ${logMessage.err?.stack}`;
         }
         if (level == 'warn') {
             return `[${timestamp}] ${chalk.yellow(level.toUpperCase())}: ${chalk.cyan(
                 `[${logMessage.type}] [${logMessage.reqId}] [${logMessage.userId + '|' + logMessage.userNickname}] [${
                     logMessage.event
-                }]: `
+                }]: ${chalk.yellow(logMessage.respTime ? logMessage.respTime + 'ms' : '')}`
             )} ${chalk.gray(JSON.stringify(logMessage.body))}`;
         }
         return `[${timestamp}] ${chalk.green(level.toUpperCase())}: ${chalk.cyan(
             `[${logMessage.type}] [${logMessage.reqId}] [${logMessage.userId + '|' + logMessage.userNickname}] [${
                 logMessage.event
-            }]: `
+            }]: ${chalk.yellow(logMessage.respTime ? logMessage.respTime + 'ms' : '')}`
         )} ${chalk.gray(JSON.stringify(logMessage.body))}`;
     })
 );
