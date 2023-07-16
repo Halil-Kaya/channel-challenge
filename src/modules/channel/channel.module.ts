@@ -4,9 +4,10 @@ import { ChannelService } from './service/channel.service';
 import { ChannelCacheRepository, ChannelMongoRepository, ChannelRepository } from './repository';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ChannelFactory } from './model/channel.model';
+import { ChannelUserModule } from '../channel-user/channel-user.module';
 
 @Module({
-    imports: [MongooseModule.forFeatureAsync([ChannelFactory])],
+    imports: [MongooseModule.forFeatureAsync([ChannelFactory]), ChannelUserModule],
     providers: [ChannelGateway, ChannelService, ChannelRepository, ChannelMongoRepository, ChannelCacheRepository],
     exports: []
 })

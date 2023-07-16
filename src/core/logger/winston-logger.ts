@@ -17,7 +17,8 @@ const consoleLogFormat = winston.format.combine(
                     body: logMessage.body,
                     meta: logMessage.meta,
                     err: logMessage.err,
-                    method: logMessage.method
+                    method: logMessage.method,
+                    errStack: logMessage.errStack
                 })
             )}`;
         }
@@ -33,7 +34,8 @@ const consoleLogFormat = winston.format.combine(
                     body: logMessage.body,
                     meta: logMessage.meta,
                     err: logMessage.err,
-                    method: logMessage.method
+                    method: logMessage.method,
+                    errStack: logMessage.errStack
                 })
             )} ${logMessage.err?.stack}`;
         }
@@ -47,7 +49,8 @@ const consoleLogFormat = winston.format.combine(
                     body: logMessage.body,
                     meta: logMessage.meta,
                     err: logMessage.err,
-                    method: logMessage.method
+                    method: logMessage.method,
+                    errStack: logMessage.errStack
                 })
             )}`;
         }
@@ -60,7 +63,8 @@ const consoleLogFormat = winston.format.combine(
                 body: logMessage.body,
                 meta: logMessage.meta,
                 err: logMessage.err,
-                method: logMessage.method
+                method: logMessage.method,
+                errStack: logMessage.errStack
             })
         )}`;
     })
@@ -117,5 +121,6 @@ export type WintstonLogParameter = {
         message: string;
         stack: string;
     };
+    errStack?: string;
     type?: 'REQ' | 'RES' | 'EMIT' | 'ACK';
 };

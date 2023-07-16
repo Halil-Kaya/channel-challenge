@@ -17,7 +17,7 @@ export class ChannelUserModel implements ChannelUser {
     @Prop({ type: String, required: true })
     userId: string;
 
-    @Prop({ type: String, required: true, enum: ChannelUserStatus })
+    @Prop({ type: String, required: true, enum: ChannelUserStatus, default: ChannelUserStatus.ACTIVE })
     status: ChannelUserStatus;
 
     @Prop({ type: String, required: true, enum: ChannelUserRole })
@@ -29,7 +29,8 @@ export class ChannelUserModel implements ChannelUser {
 
 export enum ChannelUserIndexes {
     CHANNEL_ID_USER_ID_ROLE_STATUS = 'channel_id_user_id_role_status_index',
-    CHANNEL_ID_STATUS = 'channel_id_status_index'
+    CHANNEL_ID_STATUS = 'channel_id_status_index',
+    CHANNEL_ID_USER_ID = 'channel_id_user_id_index'
 }
 
 export const ChannelUserSchema = SchemaFactory.createForClass(ChannelUserModel);
@@ -39,6 +40,7 @@ ChannelUserSchema.index(
     { background: true, name: ChannelUserIndexes.CHANNEL_ID_USER_ID_ROLE_STATUS }
 );
 ChannelUserSchema.index({ channelId: 1, status: 1 }, { background: true, name: ChannelUserIndexes.CHANNEL_ID_STATUS });
+ChannelUserSchema.index({ channelId: 1, userId: 1 }, { background: true, name: ChannelUserIndexes.CHANNEL_ID_USER_ID });
 
 function leanObjectId(result) {
     if (result) {

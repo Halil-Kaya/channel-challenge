@@ -6,7 +6,7 @@ import { ChannelUserFactory } from './model/channel-user.model';
 
 @Module({
     imports: [MongooseModule.forFeatureAsync([ChannelUserFactory])],
-    providers: [ChannelUserRepository],
+    providers: [ChannelUserRepository, ChannelUserInternalService],
     exports: [ChannelUserInternalService]
 })
 export class ChannelUserModule {}
