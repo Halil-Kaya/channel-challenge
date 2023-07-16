@@ -3,7 +3,7 @@ import { ChannelEvents } from '../../../src/core/enum/channel-gateway.enum';
 import { sleep } from '../../common/helper';
 import { decrypt, encrypt } from '../../common/crypto.helper';
 
-it('Should user create channel', async () => {
+it('Should user create channelq', async () => {
     const [A] = await haveUsers(1);
     await A.connect();
     await new Promise<void>(async (res, rej) => {
@@ -15,6 +15,6 @@ it('Should user create channel', async () => {
             res();
         });
         await sleep(500);
-        console.log('event gitmedi');
+        rej();
     });
 });

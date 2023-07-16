@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { ClientSession, Model } from 'mongoose';
 import { ChannelDocument, ChannelModel } from '../model/channel.model';
-import { Channel } from '../../../../core/interface';
+import { Channel } from '../../../core/interface';
 
 @Injectable()
 export class ChannelMongoRepository {

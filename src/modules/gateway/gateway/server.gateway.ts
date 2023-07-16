@@ -8,8 +8,8 @@ import {
 import { Server, Socket } from 'socket.io';
 import { CryptoService } from '../../../core/service';
 import { logger } from '../../../core/logger/logger';
-import { AuthProvider } from './provider/auth.provider';
-import { SocketMiddleware } from './middleware';
+import { AuthProvider } from '../provider/auth.provider';
+import { SocketMiddleware } from '../middleware';
 import { DiscoveryService } from '@golevelup/nestjs-discovery';
 import { SocketEmit } from '../../../core/interface';
 

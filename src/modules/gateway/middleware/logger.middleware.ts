@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Socket } from 'socket.io';
-import { logger } from '../../../../core/logger/logger';
-import { SocketEmit } from '../../../../core/interface';
+import { logger } from '../../../core/logger/logger';
+import { SocketEmit } from '../../../core/interface';
 
 @Injectable()
 export class LoggerMiddleware {

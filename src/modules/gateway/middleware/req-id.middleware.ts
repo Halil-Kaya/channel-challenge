@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CryptoService } from '../../../../core/service';
+import { CryptoService } from '../../../core/service';
 
 @Injectable()
 export class ReqIdMiddleware {

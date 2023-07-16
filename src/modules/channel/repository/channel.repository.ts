@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ChannelCacheRepository } from './channel.cache.repository';
 import { ChannelMongoRepository } from './channel.mongo.repository';
-import { Channel } from '../../../../core/interface';
+import { Channel } from '../../../core/interface';
 import { ClientSession } from 'mongoose';
 
 @Injectable()

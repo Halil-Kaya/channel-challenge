@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRedis } from '@nestjs-modules/ioredis';
 import Redis from 'ioredis';
-import { Channel, SerializedChannel } from '../../../../core/interface';
-import { cacheKeys, cacheTTL } from '../../../../core/cache';
+import { Channel, SerializedChannel } from '../../../core/interface';
+import { cacheKeys, cacheTTL } from '../../../core/cache';
 
 @Injectable()
 export class ChannelCacheRepository {

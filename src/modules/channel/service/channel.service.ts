@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ChannelRepository } from '../repository';
 import { ChannelCreateAck, ChannelCreateEmit } from '../emit';
-import { SocketEmit } from '../../../../core/interface';
+import { SocketEmit } from '../../../core/interface';
 
 @Injectable()
 export class ChannelService {

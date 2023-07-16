@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { EventHandler } from '../../../../core/decorator';
-import { ChannelEvents } from '../../../../core/enum/channel-gateway.enum';
-import { SocketEmit } from '../../../../core/interface';
+import { EventHandler } from '../../../core/decorator';
+import { ChannelEvents } from '../../../core/enum/channel-gateway.enum';
+import { SocketEmit } from '../../../core/interface';
 import { ChannelCreateAck, ChannelCreateEmit } from '../emit';
 import { ChannelService } from '../service/channel.service';
 

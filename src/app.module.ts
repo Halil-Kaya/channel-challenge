@@ -9,7 +9,10 @@ import { CryptoService } from './core/service';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { TransformInterceptor } from './core/interceptor';
 import { DevModule } from './modules/dev/dev.module';
+import { GatewayModule } from './modules/gateway/gateway.module';
 import { ChannelModule } from './modules/channel/channel.module';
+import { ChannelUserModel } from './modules/channel-user/model/channel-user.model';
+import { ChannelMessageModule } from './modules/channel-message/channel-message.module';
 
 @Module({
     imports: [
@@ -36,8 +39,11 @@ import { ChannelModule } from './modules/channel/channel.module';
         }),
         AuthModule,
         UserModule,
+        DevModule,
+        GatewayModule,
         ChannelModule,
-        DevModule
+        ChannelUserModel,
+        ChannelMessageModule
     ],
     controllers: [],
     providers: [

@@ -1,6 +1,6 @@
 import { Document, Schema as MongooseSchema, Types } from 'mongoose';
 import { AsyncModelFactory, Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { User } from '../../../core/interface';
+import { CollectionName, User } from '../../../core/interface';
 import { hashSync } from 'bcryptjs';
 
 export type UserDocument = UserModel & Document;
@@ -48,7 +48,7 @@ function leanObjectId(result) {
 }
 
 export const UserFactory: AsyncModelFactory = {
-    collection: 'user',
+    collection: CollectionName.USER,
     name: UserModel.name,
     useFactory: () => {
         UserSchema.pre('save', preSave);

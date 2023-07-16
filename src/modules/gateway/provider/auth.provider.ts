@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { AuthService } from '../../../auth/service/auth.service';
-import { User } from '../../../../core/interface';
-import { UnauthorizedException } from '../../../../core/error';
-import { UserSessionInternalService } from '../../../user/service';
+import { AuthService } from '../../auth/service/auth.service';
+import { User } from '../../../core/interface';
+import { UnauthorizedException } from '../../../core/error';
+import { UserSessionInternalService } from '../../user/service';
 
 @Injectable()
 export class AuthProvider {

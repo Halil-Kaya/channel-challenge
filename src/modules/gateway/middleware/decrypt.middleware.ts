@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { CryptoService } from '../../../../core/service';
-import { SocketEmit } from '../../../../core/interface';
+import { CryptoService } from '../../../core/service';
+import { SocketEmit } from '../../../core/interface';
 
 @Injectable()
 export class DecryptMiddleware {
