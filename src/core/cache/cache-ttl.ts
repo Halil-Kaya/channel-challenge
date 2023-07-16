@@ -1,4 +1,7 @@
 export const cacheTTL = {
+    channel: {
+        channel: 60 * 60 * 1000
+    },
     user: {
         user: 60 * 60 * 1000,
         auth: 60 * 60 * 1000,

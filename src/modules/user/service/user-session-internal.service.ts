@@ -13,6 +13,4 @@ export class UserSessionInternalService {
     deleteCache(userId: string): Promise<void> {
         return this.userSessionCacheRepository.deleteCache(userId);
     }
-
-    findOnlineUserIds() {}
 }

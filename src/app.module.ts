@@ -9,7 +9,7 @@ import { CryptoService } from './core/service';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { TransformInterceptor } from './core/interceptor';
 import { DevModule } from './modules/dev/dev.module';
-import { ChannelModule } from './modules/channel/channel.model';
+import { ChannelModule } from './modules/channel/channel.module';
 
 @Module({
     imports: [

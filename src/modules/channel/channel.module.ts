@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ChannelGateway } from './channel/channel.gateway';
+import { ChannelGateway } from './channel/gateway/channel.gateway';
 import { ChannelMessageGateway } from './channel-message/channel-message.gateway';
 import { ChannelUserGateway } from './channel-user/channel-user.gateway';
 import { ServerGateway } from './server/server.gateway';
@@ -16,8 +16,13 @@ import {
     SocketMiddleware
 } from './server/middleware';
 import { DiscoveryModule } from '@golevelup/nestjs-discovery';
+import { MongooseModule } from '@nestjs/mongoose';
+import { ChannelFactory } from './channel/model/channel.model';
+import { ChannelService } from './channel/service/channel.service';
+import { ChannelCacheRepository, ChannelMongoRepository, ChannelRepository } from './channel/repository';
+
 @Module({
-    imports: [UserModule, AuthModule, DiscoveryModule],
+    imports: [UserModule, AuthModule, DiscoveryModule, MongooseModule.forFeatureAsync([ChannelFactory])],
     controllers: [],
     providers: [
         ChannelGateway,
@@ -31,7 +36,11 @@ import { DiscoveryModule } from '@golevelup/nestjs-discovery';
         AdjustPackageMiddleware,
         CurrentUserMiddleware,
         LoggerMiddleware,
-        DecryptMiddleware
+        DecryptMiddleware,
+        ChannelService,
+        ChannelRepository,
+        ChannelMongoRepository,
+        ChannelCacheRepository
     ]
 })
 export class ChannelModule {}
