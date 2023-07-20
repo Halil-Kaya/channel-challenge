@@ -1,8 +1,7 @@
-import { createUser } from '../../common/user.helper';
 import { UserCreateDto } from '../../../src/modules/user/dto';
-import { signIn } from '../../common/auth.helper';
 import { MetaInterface } from '../../../src/core/interceptor';
 import { ErrorCode } from '../../../src/core/error';
+import { createUser, signIn } from "../../common";
 
 it('Should sign-in user', async () => {
     const dto: UserCreateDto = {

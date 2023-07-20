@@ -1,10 +1,9 @@
-import { createUser } from '../../common/user.helper';
-import { getRedis, UserMongoModel } from '../../common/db';
 import { UserCreateDto } from '../../../src/modules/user/dto';
 import * as bcrypt from 'bcryptjs';
 import { MetaInterface } from '../../../src/core/interceptor';
 import { ErrorCode } from '../../../src/core/error';
 import { cacheKeys } from '../../../src/core/cache';
+import { createUser, getRedis, UserMongoModel } from '../../common';
 
 it('should create user', async () => {
     const dto: UserCreateDto = {

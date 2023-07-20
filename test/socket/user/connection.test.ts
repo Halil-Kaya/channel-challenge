@@ -1,7 +1,5 @@
-import { haveUsers } from '../../common/have-users.helper';
-import { sleep } from '../../common/helper';
-import { getRedis } from '../../common/db';
 import { cacheKeys } from '../../../src/core/cache';
+import { getRedis, haveUsers, sleep } from '../../common';
 
 it('Should user connect and disconnect socket', async () => {
     const [A] = await haveUsers(1);

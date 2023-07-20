@@ -1,7 +1,5 @@
-import { haveUsers } from '../../common/have-users.helper';
 import { ChannelEvents } from '../../../src/core/enum/channel-gateway.enum';
-import { sleep } from '../../common/helper';
-import { decrypt, encrypt } from '../../common/crypto.helper';
+import { decrypt, encrypt, haveUsers, sleep } from '../../common';
 import { ChannelCreateAck, ChannelCreateEmit } from '../../../src/modules/channel/emit';
 
 it('Should user create channel', async () => {
