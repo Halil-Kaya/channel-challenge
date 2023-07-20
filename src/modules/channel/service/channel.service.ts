@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ChannelRepository } from '../repository';
-import { ChannelCreateAck, ChannelCreateEmit } from '../emit';
+import { ChannelCreateAck, ChannelCreateEmit, ChannelSearchAck, ChannelSearchEmit } from '../emit';
 import { ChannelUserRole, SocketEmit } from '../../../core/interface';
 import { ChannelUserInternalService } from '../../channel-user/service/channel-user-internal.service';
 import { Connection } from 'mongoose';
@@ -39,5 +39,9 @@ export class ChannelService {
             owner: channel.owner,
             createdAt: channel.createdAt
         };
+    }
+
+    async search({ payload }: SocketEmit<ChannelSearchEmit>): Promise<ChannelSearchAck> {
+        return;
     }
 }
