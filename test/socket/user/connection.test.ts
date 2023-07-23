@@ -6,10 +6,12 @@ it('Should user connect and disconnect socket', async () => {
     await A.connect();
     await sleep(1000);
     const redis = await getRedis();
-    const sessionInRedis = await redis.hGet(cacheKeys.session_user, A.user._id);
-    expect(sessionInRedis).toBe(A.user.nickname);
+    const sessionInRedis = await redis.hGetAll(cacheKeys.session_user(A.user._id));
+    expect(sessionInRedis._id).toBe(A.user._id);
+    expect(sessionInRedis.nickname).toBe(A.user.nickname);
+    expect(sessionInRedis.nodeId).toBeTruthy();
     await A.disconnect();
     await sleep(1000);
-    const exist = await redis.hExists(cacheKeys.session_user, A.user._id);
-    expect(exist).toBe(false);
+    const exist = await redis.exists(cacheKeys.session_user(A.user._id));
+    expect(exist).toBe(0);
 });

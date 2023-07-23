@@ -7,6 +7,10 @@ export enum ErrorCode {
     //401
     UNAUTHORIZED = 40100,
 
+    //404
+    NOT_FOUND = 40400,
+    CHANNEL_NOT_FOUND = 40401,
+
     //429
     RACE_CONDITION = 42900
 }

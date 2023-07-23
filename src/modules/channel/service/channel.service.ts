@@ -1,18 +1,29 @@
 import { Injectable } from '@nestjs/common';
 import { ChannelRepository } from '../repository';
-import { ChannelCreateAck, ChannelCreateEmit, ChannelSearchAck, ChannelSearchEmit } from '../emit';
-import { ChannelUserRole, SocketEmit } from '../../../core/interface';
+import {
+    ChannelCreateAck,
+    ChannelCreateEmit,
+    ChannelJoinAck,
+    ChannelJoinEmit,
+    ChannelSearchAck,
+    ChannelSearchEmit
+} from '../emit';
+import { ChannelUserRole, ChannelUserStatus, SocketEmit } from '../../../core/interface';
 import { ChannelUserInternalService } from '../../channel-user/service/channel-user-internal.service';
 import { Connection } from 'mongoose';
 import { InjectConnection } from '@nestjs/mongoose';
 import { ChannelSearchService } from '../../utils/elastic-search/services/channel-serach.service';
+import { ChannelNotFoundException, RaceConditionException } from '../../../core/error';
+import { LockService } from '../../../core/service';
+import { cacheKeys, cacheTTL } from '../../../core/cache';
 
 @Injectable()
 export class ChannelService {
     constructor(
         private readonly channelRepository: ChannelRepository,
-        private readonly channelUserService: ChannelUserInternalService,
+        private readonly channelUserInternalService: ChannelUserInternalService,
         private readonly channelSearchService: ChannelSearchService,
+        private readonly lockService: LockService,
         @InjectConnection() private readonly mongoConnection: Connection
     ) {}
 
@@ -25,11 +36,11 @@ export class ChannelService {
                     ...payload,
                     owner: client._id.toString()
                 });
-
-                await this.channelUserService.save({
+                await this.channelUserInternalService.findOneAndUpdate(channel._id, {
                     channelId: channel._id,
                     userId: channel.owner,
-                    role: ChannelUserRole.OWNER
+                    role: ChannelUserRole.OWNER,
+                    status: ChannelUserStatus.ACTIVE
                 });
             },
             { retryWrites: true }
@@ -57,5 +68,40 @@ export class ChannelService {
                 description: result.description
             };
         });
+    }
+
+    async join({ payload, client }: SocketEmit<ChannelJoinEmit>): Promise<ChannelJoinAck> {
+        const { channelId } = payload;
+
+        let lock;
+        try {
+            lock = await this.lockService.lock(cacheKeys.channel_join(payload.channelId, client._id), {
+                ttl: cacheTTL.lock.channel_join,
+                noRetry: true
+            });
+        } catch (err) {
+            throw new RaceConditionException(`RaceCond: ${cacheKeys.channel_join(payload.channelId, client._id)}`);
+        }
+
+        const isInChannel = await this.channelUserInternalService.isInChannel(client._id, channelId);
+        if (isInChannel) {
+            return;
+        }
+
+        const channel = await this.channelRepository.findById(channelId);
+        if (!channel) {
+            throw new ChannelNotFoundException();
+        }
+
+        await this.channelUserInternalService.findOneAndUpdate(channel._id, {
+            channelId: channel._id,
+            userId: channel.owner,
+            role: ChannelUserRole.SUBSCRIBER,
+            status: ChannelUserStatus.ACTIVE
+        });
+        //TODO send event to another users
+
+        await lock.release();
+        return;
     }
 }

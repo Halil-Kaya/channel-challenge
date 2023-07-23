@@ -16,4 +16,17 @@ export class ChannelRepository {
         await this.channelCacheRepository.save(createdChannel);
         return createdChannel;
     }
+
+    async findById(channelId: string): Promise<Channel> {
+        const channelCache = await this.channelCacheRepository.getChannelById(channelId);
+        if (channelCache) {
+            return channelCache;
+        }
+        const channelMongo = await this.channelMongoRepository.findById(channelId);
+        if (channelMongo) {
+            await this.channelCacheRepository.save(channelMongo);
+            return channelMongo;
+        }
+        return null;
+    }
 }

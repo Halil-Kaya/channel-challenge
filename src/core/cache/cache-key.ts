@@ -1,16 +1,17 @@
 export const cacheKeys = {
-    //userId -> USER, Expires
+    //userId -> User, Expires
     user: (userId: string) => `user:${userId}`,
 
-    //channelId -> CHANNEL, Expires
+    //channelId -> Channel, Expires
     channel: (channelId: string) => `channel:${channelId}`,
 
-    //Hash userId -> nickname
-    session_user: `user_sessions_map`,
+    //userId -> UserSession
+    session_user: (userId: string) => `user_sessions:${userId}`,
 
     //Hash nickname -> userId
     nickname_map: `nickname_map`,
 
     //locks
-    nickname: (nickname: string) => `nickname:${nickname}`
+    nickname: (nickname: string) => `nickname:${nickname}`,
+    channel_join: (channelId: string, userId) => `channel_join:${channelId}:${userId}`
 };
