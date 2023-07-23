@@ -5,12 +5,14 @@ import { ChannelUserRole, SocketEmit } from '../../../core/interface';
 import { ChannelUserInternalService } from '../../channel-user/service/channel-user-internal.service';
 import { Connection } from 'mongoose';
 import { InjectConnection } from '@nestjs/mongoose';
+import { ChannelSearchService } from '../../utils/elastic-search/services/channel-serach.service';
 
 @Injectable()
 export class ChannelService {
     constructor(
         private readonly channelRepository: ChannelRepository,
         private readonly channelUserService: ChannelUserInternalService,
+        private readonly channelSearchService: ChannelSearchService,
         @InjectConnection() private readonly mongoConnection: Connection
     ) {}
 
@@ -32,6 +34,11 @@ export class ChannelService {
             },
             { retryWrites: true }
         );
+        await this.channelSearchService.insert({
+            id: channel._id,
+            name: channel.name,
+            description: channel.description
+        });
         return {
             _id: channel._id,
             name: channel.name,
@@ -41,7 +48,14 @@ export class ChannelService {
         };
     }
 
-    async search({ payload }: SocketEmit<ChannelSearchEmit>): Promise<ChannelSearchAck> {
-        return;
+    async search({ payload }: SocketEmit<ChannelSearchEmit>): Promise<ChannelSearchAck[]> {
+        const results = await this.channelSearchService.search(payload.text);
+        return results.map((result) => {
+            return {
+                _id: result.id,
+                name: result.name,
+                description: result.description
+            };
+        });
     }
 }

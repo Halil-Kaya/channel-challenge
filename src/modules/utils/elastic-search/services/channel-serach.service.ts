@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { ElasticsearchService } from '@nestjs/elasticsearch';
-import { Channel } from '../../../../core/interface';
 import { SearchIndex } from '../enum/search-index';
+import { ChannelElastic } from '../interface';
 
 @Injectable()
 export class ChannelSearchService {
     constructor(private readonly elasticsearchService: ElasticsearchService) {}
 
-    async search(text: string) {
-        const { hits } = await this.elasticsearchService.search<Channel>({
+    async search(text: string): Promise<ChannelElastic[]> {
+        const { hits } = await this.elasticsearchService.search<ChannelElastic>({
             index: SearchIndex.CHANNEL_SEARCH,
             body: {
                 query: {
@@ -22,12 +22,10 @@ export class ChannelSearchService {
         return hits.hits.map((item) => item._source);
     }
 
-    insert(channel: Pick<Channel, '_id' | 'name' | 'description'>) {
-        channel['id'] = channel._id;
-        delete channel._id;
+    insert(channelElastic: ChannelElastic) {
         return this.elasticsearchService.index({
             index: SearchIndex.CHANNEL_SEARCH,
-            document: channel
+            document: channelElastic
         });
     }
 

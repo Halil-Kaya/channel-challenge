@@ -15,7 +15,7 @@ export class ChannelGateway {
     }
 
     @EventHandler(ChannelEvents.CHANNEL_SEARCH)
-    async channelSearch(dto: SocketEmit<ChannelSearchEmit>): Promise<ChannelSearchAck> {
+    async channelSearch(dto: SocketEmit<ChannelSearchEmit>): Promise<ChannelSearchAck[]> {
         return this.channelService.search(dto);
     }
 }
