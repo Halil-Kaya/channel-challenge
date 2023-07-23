@@ -7,4 +7,7 @@ export interface Environment {
     JWT_EXPIRES: string;
     JWT_ALGORITHM: string;
     CRYPTO_PASSWORD: string;
+    ELASTICSEARCH_NODE: string;
+    ELASTICSEARCH_USERNAME: string;
+    ELASTICSEARCH_PASSWORD: string;
 }
