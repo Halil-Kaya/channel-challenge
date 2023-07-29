@@ -16,5 +16,6 @@ export class ChannelJoinedBroadcast {
     })
     public async handle(msg: BroadcastEvent<ChannelJoinedBroadcastEvent>) {
         console.log({ msg });
+        //send individual event to client
     }
 }

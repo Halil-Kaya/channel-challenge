@@ -1,7 +1,9 @@
 import { closeMongoDb, closeRedis, connectMongoDb, connectRedis, resetElasticsearch } from './common';
 
+export const customUsers = [];
+
 afterAll(async () => {
-    await Promise.all([closeMongoDb(), closeRedis(), resetElasticsearch()]);
+    await Promise.all([closeMongoDb(), closeRedis(), resetElasticsearch(), customUsers.map((user) => user.clear())]);
 });
 
 beforeEach(async () => {

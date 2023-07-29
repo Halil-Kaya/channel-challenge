@@ -35,6 +35,7 @@ export class ServerGateway implements OnGatewayInit, OnGatewayConnection, OnGate
             try {
                 const startTime = Date.now();
                 const { token } = <{ token: string }>this.cryptoService.decrypt(socket.handshake?.query?.data + '');
+                socket.data['connectionTime'] = Date.now();
                 socket.data.user = await this.authProvider.auth(token);
                 logger.info({
                     reqId: socket.id,
@@ -59,6 +60,16 @@ export class ServerGateway implements OnGatewayInit, OnGatewayConnection, OnGate
     }
     async handleDisconnect(socket: Socket) {
         await this.authProvider.disconnect(socket.data.user);
+        logger.info({
+            reqId: socket.id,
+            user: socket.data.user,
+            event: 'user_disconnect',
+            method: 'SOCKET',
+            type: 'ACK',
+            meta: {
+                connectionTime: Date.now() - socket.data['connectionTime']
+            }
+        });
     }
 
     private async registerHandlers(socket: Socket) {

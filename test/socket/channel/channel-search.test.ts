@@ -1,8 +1,10 @@
 import { haveUsers, sleep } from '../../common';
 import { createChannel, searchChannel } from '../../common/channel.helper';
+import { customUsers } from '../../test-setup';
 
 it('Should search channel', async () => {
     const [A] = await haveUsers(1);
+    customUsers.push(A);
     await A.connect();
     const channels = await Promise.all([
         createChannel(A.client, { name: 'a aaa a ', description: 'b' }),

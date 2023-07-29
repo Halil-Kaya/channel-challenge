@@ -1,9 +1,11 @@
-import { ChannelEvents } from '../../../src/core/enum/channel-gateway.enum';
 import { decrypt, encrypt, haveUsers, sleep } from '../../common';
 import { ChannelCreateAck, ChannelCreateEmit } from '../../../src/modules/channel/emit';
+import { customUsers } from '../../test-setup';
+import { ChannelEvents } from '../../../src/core/enum';
 
 it('Should user create channel', async () => {
     const [A] = await haveUsers(1);
+    customUsers.push(A);
     await A.connect();
     const dto: ChannelCreateEmit = {
         name: 'test',
