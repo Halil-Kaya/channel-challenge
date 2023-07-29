@@ -23,7 +23,6 @@ export class ChannelJoinedBroadcast {
         queue: RabbitMqQueueName
     })
     public async handle({ client, payload, reqId }: BroadcastEvent<ChannelJoinedBroadcastEvent>) {
-        console.log('event geldi!!', { payload });
         const userSession = await this.userSessionIntervalService.getSessionUser(client._id);
         this.eventPublisher.publish(userSession.nodeId, {
             reqId,

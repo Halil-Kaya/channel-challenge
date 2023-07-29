@@ -7,4 +7,12 @@ import { NodeIdHelper } from '../../../core/helper';
 @Injectable()
 export class SocketEmitService {
     constructor(private readonly serverGateway: ServerGateway) {}
+
+    @RabbitSubscribe({
+        routingKey: NodeIdHelper.getNodeId(),
+        queue: RabbitMqQueueName
+    })
+    async handleIndividual(paylaod: any) {
+        console.log('handleIndividual event geldi');
+    }
 }

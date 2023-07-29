@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { AllExceptionFilter } from './core/filter';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { NodeIdHelper } from './core/helper';
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
@@ -26,6 +27,6 @@ async function bootstrap() {
 }
 bootstrap()
     .then(async (app) => {
-        console.log(`App is running on: ${await app.getUrl()}`);
+        console.log(`App is running on: ${await app.getUrl()} NodeId: ${NodeIdHelper.getNodeId()}`);
     })
     .catch((error: Error) => console.error(error.message));
