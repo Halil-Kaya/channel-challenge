@@ -12,9 +12,11 @@ import {
     SocketMiddleware
 } from './middleware';
 import { UserModule } from '../user/user.module';
+import { SocketEmitService } from './service/socket-emit.service';
+import { CustomRabbitMqModule } from '../utils/rabbitmq/rabbitmq.module';
 
 @Module({
-    imports: [DiscoveryModule, UserModule],
+    imports: [DiscoveryModule, UserModule, CustomRabbitMqModule],
     providers: [
         ServerGateway,
         CryptoService,
@@ -24,7 +26,8 @@ import { UserModule } from '../user/user.module';
         AdjustPackageMiddleware,
         CurrentUserMiddleware,
         LoggerMiddleware,
-        DecryptMiddleware
+        DecryptMiddleware,
+        SocketEmitService
     ]
 })
 export class GatewayModule {}

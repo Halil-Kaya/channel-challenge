@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { SessionUser, User } from '../../../core/interface';
+import { UserSession, User, SerializedUserSession } from '../../../core/interface';
 import { InjectRedis } from '@nestjs-modules/ioredis';
 import Redis from 'ioredis';
 import { cacheKeys } from '../../../core/cache';
@@ -10,18 +10,38 @@ export class UserSessionCacheRepository {
     constructor(@InjectRedis() private readonly redis: Redis) {}
 
     async save(user: Omit<User, 'password'>): Promise<void> {
-        await this.redis.hset(cacheKeys.session_user(user._id), this.serializeUserSession(user));
+        const userSession = this.convertUserToSessionUserObjcet(user);
+        await this.redis.hset(cacheKeys.session_user(user._id), this.serializeUserSession(userSession));
     }
 
     async deleteCache(userId: string): Promise<void> {
         await this.redis.del(cacheKeys.session_user(userId));
     }
 
-    serializeUserSession(user: Omit<User, 'password'>): SessionUser {
+    async getSessionUser(userId: string): Promise<UserSession> {
+        const userSessionCache: SerializedUserSession = <SerializedUserSession>(
+            await this.redis.hgetall(cacheKeys.session_user(userId))
+        );
+        return this.deserializeUserSession(userSessionCache);
+    }
+
+    private convertUserToSessionUserObjcet(user: Omit<User, 'password'>): UserSession {
         return {
-            _id: user._id.toString(),
+            userId: user._id.toString(),
             nickname: user.nickname,
             nodeId: NodeIdHelper.getNodeId()
+        };
+    }
+
+    private serializeUserSession(sessionUser: UserSession): SerializedUserSession {
+        return {
+            ...sessionUser
+        };
+    }
+
+    private deserializeUserSession(serializedUserSession: SerializedUserSession): UserSession {
+        return {
+            ...serializedUserSession
         };
     }
 }

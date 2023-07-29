@@ -24,7 +24,7 @@ export class ChannelCacheRepository {
         return this.deserializeChannel(channelCache);
     }
 
-    serializeChannel(channel: Channel): SerializedChannel {
+    private serializeChannel(channel: Channel): SerializedChannel {
         return {
             _id: channel._id.toString(),
             name: channel.name,
@@ -34,7 +34,7 @@ export class ChannelCacheRepository {
         };
     }
 
-    deserializeChannel(serializedChannel: SerializedChannel): Channel {
+    private deserializeChannel(serializedChannel: SerializedChannel): Channel {
         return {
             ...serializedChannel,
             _id: serializedChannel._id,

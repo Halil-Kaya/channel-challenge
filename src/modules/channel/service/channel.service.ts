@@ -104,7 +104,6 @@ export class ChannelService {
             status: ChannelUserStatus.ACTIVE
         });
         await lock.release();
-
         this.eventPublisher.publish<ChannelJoinedBroadcastEvent>(ChannelBroadcast.CHANNEL_JOINED, {
             client,
             reqId,

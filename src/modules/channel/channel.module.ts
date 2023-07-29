@@ -9,13 +9,15 @@ import { ElasticSearchModule } from '../utils/elastic-search/elastic-search.modu
 import { LockService } from '../../core/service';
 import { ChannelJoinedBroadcast } from './broadcast';
 import { CustomRabbitMqModule } from '../utils/rabbitmq/rabbitmq.module';
+import { UserModule } from '../user/user.module';
 
 @Module({
     imports: [
         MongooseModule.forFeatureAsync([ChannelFactory]),
         ChannelUserModule,
         ElasticSearchModule,
-        CustomRabbitMqModule
+        CustomRabbitMqModule,
+        UserModule
     ],
     providers: [
         ChannelGateway,

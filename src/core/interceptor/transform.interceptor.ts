@@ -27,16 +27,24 @@ export class TransformInterceptor implements NestInterceptor {
     intercept(context: ExecutionContext, next: CallHandler): Observable<string> {
         try {
             if (isRabbitContext(context)) {
-                const args = context.getArgs();
-                const payload = args[0];
-                const { routingKey } = args[1].fields;
-                logger.info({
-                    reqId: payload.reqId,
-                    type: 'EMIT',
-                    event: routingKey,
-                    body: payload,
-                    method: 'RABBITMQ'
-                });
+                try {
+                    const args = context.getArgs();
+                    const payload = args[0];
+                    const { routingKey } = args[1].fields;
+                    logger.info({
+                        reqId: payload.reqId,
+                        type: 'EMIT',
+                        event: routingKey,
+                        body: payload,
+                        method: 'RABBITMQ'
+                    });
+                } catch (err) {
+                    logger.error({
+                        type: 'EMIT',
+                        method: 'RABBITMQ',
+                        err
+                    });
+                }
                 return next.handle();
             }
             const request = context.switchToHttp().getRequest();

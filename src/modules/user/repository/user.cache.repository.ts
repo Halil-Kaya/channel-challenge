@@ -49,7 +49,7 @@ export class UserCacheRepository {
         await this.redis.del(cacheKey);
     }
 
-    serializeUser(user: Omit<User, 'password'>): SerializedUser {
+    private serializeUser(user: Omit<User, 'password'>): SerializedUser {
         return {
             _id: user._id.toString(),
             fullName: user.fullName,
@@ -58,7 +58,7 @@ export class UserCacheRepository {
         };
     }
 
-    deserializeUser(serializedUser: SerializedUser): Omit<User, 'password'> {
+    private deserializeUser(serializedUser: SerializedUser): Omit<User, 'password'> {
         return {
             ...serializedUser,
             _id: serializedUser._id,

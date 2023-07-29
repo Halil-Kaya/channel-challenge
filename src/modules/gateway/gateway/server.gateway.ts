@@ -30,6 +30,21 @@ export class ServerGateway implements OnGatewayInit, OnGatewayConnection, OnGate
         private readonly discoveryService: DiscoveryService
     ) {}
 
+    public getServer() {
+        return this.server;
+    }
+
+    public getSocketById(socketId: string): Socket | undefined {
+        if (!this.server) {
+            return undefined;
+        }
+        return this.server.sockets.sockets.get(socketId);
+    }
+
+    public getAllSockets() {
+        return this.server.sockets.sockets;
+    }
+
     afterInit(server: Server) {
         server.use(async (socket: Socket, next) => {
             try {

@@ -12,11 +12,11 @@ export class EventPublisher {
         private readonly configService: ConfigService<Environment>
     ) {}
 
-    publish<T>(routingKey: ChannelBroadcast, payload: BroadcastEvent<T>) {
+    publish<T>(routingKey: ChannelBroadcast | string, payload: BroadcastEvent<T>) {
         this.amqpConnection
             .publish(
                 this.configService.get('RABBITMQ_EXCHANGES_NAME'),
-                ChannelBroadcast.CHANNEL_JOINED,
+                routingKey,
                 Buffer.from(JSON.stringify(payload), 'utf8')
             )
             .catch((err) => {
