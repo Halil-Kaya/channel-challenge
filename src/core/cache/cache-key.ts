@@ -1,9 +1,9 @@
 export const cacheKeys = {
     //userId -> User, Expires
-    user: (userId: string) => `user:${userId}`,
+    user: (userId: string) => `ex:user:${userId}`,
 
     //channelId -> Channel, Expires
-    channel: (channelId: string) => `channel:${channelId}`,
+    channel: (channelId: string) => `ex:channel:${channelId}`,
 
     //userId -> UserSession
     session_user: (userId: string) => `user_sessions:${userId}`,

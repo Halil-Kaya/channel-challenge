@@ -2,11 +2,13 @@ import { Socket } from 'socket.io-client';
 import {
     ChannelCreateAck,
     ChannelCreateEmit,
+    ChannelJoinAck,
+    ChannelJoinEmit,
     ChannelSearchAck,
     ChannelSearchEmit
 } from '../../src/modules/channel/emit';
 import { getRandomNumber } from './helper';
-import { ChannelEvents } from '../../src/core/enum/channel-gateway.enum';
+import { ChannelEvents } from '../../src/core/enum';
 import { decrypt, encrypt } from './crypto.helper';
 
 export const createChannel = async (client: Socket, dto?: ChannelCreateEmit): Promise<ChannelCreateAck> => {
@@ -30,6 +32,17 @@ export const createChannel = async (client: Socket, dto?: ChannelCreateEmit): Pr
 export const searchChannel = async (client: Socket, dto: ChannelSearchEmit): Promise<ChannelSearchAck[]> => {
     return new Promise((res, rej) => {
         client.emit(ChannelEvents.CHANNEL_SEARCH, encrypt(dto), (error, response) => {
+            if (error) {
+                rej(decrypt(error));
+            }
+            res(decrypt(response));
+        });
+    });
+};
+
+export const joinChannel = async (client: Socket, dto: ChannelJoinEmit): Promise<ChannelJoinAck> => {
+    return new Promise((res, rej) => {
+        client.emit(ChannelEvents.CHANNEL_JOIN, encrypt(dto), (error, response) => {
             if (error) {
                 rej(decrypt(error));
             }

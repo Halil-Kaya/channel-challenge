@@ -9,24 +9,25 @@ const consoleLogFormat = winston.format.combine(
 
         if (level == 'info') {
             return `[${timestamp}] ${chalk.green(level.toUpperCase())}: ${chalk.cyan(
-                `[${logMessage.type}] [${logMessage.reqId}] [${logMessage.userId + '|' + logMessage.userNickname}] [${
-                    logMessage.event
-                }]: ${chalk.yellow(logMessage.respTime ? logMessage.respTime + 'ms' : '')}`
+                `[${logMessage.method}] [${logMessage.type}] [${logMessage.reqId}] [${
+                    logMessage.userId + '|' + logMessage.userNickname
+                }] [${logMessage.event}]: ${chalk.yellow(logMessage.respTime ? logMessage.respTime + 'ms' : '')}`
             )} ${chalk.gray(
                 JSON.stringify({
                     body: logMessage.body,
                     meta: logMessage.meta,
                     err: logMessage.err,
-                    method: logMessage.method,
                     errStack: logMessage.errStack
                 })
             )}`;
         }
         if (level == 'error') {
             return `[${timestamp}] ${chalk.red(level.toUpperCase())}: ${chalk.red(
-                `[${logMessage.type}] [${logMessage.reqId}] [${logMessage.userId + '|' + logMessage.userNickname}] [${
-                    logMessage.event
-                }] [ERROR:${logMessage.err?.errorCode || ''}] ${logMessage.err?.message?.toUpperCase()}: ${chalk.yellow(
+                `[${logMessage.method}] [${logMessage.type}] [${logMessage.reqId}] [${
+                    logMessage.userId + '|' + logMessage.userNickname
+                }] [${logMessage.event}] [ERROR:${
+                    logMessage.err?.errorCode || ''
+                }] ${logMessage.err?.message?.toUpperCase()}: ${chalk.yellow(
                     logMessage.respTime ? logMessage.respTime + 'ms' : ''
                 )} `
             )} ${chalk.gray(
@@ -34,36 +35,33 @@ const consoleLogFormat = winston.format.combine(
                     body: logMessage.body,
                     meta: logMessage.meta,
                     err: logMessage.err,
-                    method: logMessage.method,
                     errStack: logMessage.errStack
                 })
             )} ${logMessage.err?.stack}`;
         }
         if (level == 'warn') {
             return `[${timestamp}] ${chalk.yellow(level.toUpperCase())}: ${chalk.cyan(
-                `[${logMessage.type}] [${logMessage.reqId}] [${logMessage.userId + '|' + logMessage.userNickname}] [${
-                    logMessage.event
-                }]: ${chalk.yellow(logMessage.respTime ? logMessage.respTime + 'ms' : '')}`
+                `[${logMessage.method}] [${logMessage.type}] [${logMessage.reqId}] [${
+                    logMessage.userId + '|' + logMessage.userNickname
+                }] [${logMessage.event}]: ${chalk.yellow(logMessage.respTime ? logMessage.respTime + 'ms' : '')}`
             )} ${chalk.gray(
                 JSON.stringify({
                     body: logMessage.body,
                     meta: logMessage.meta,
                     err: logMessage.err,
-                    method: logMessage.method,
                     errStack: logMessage.errStack
                 })
             )}`;
         }
         return `[${timestamp}] ${chalk.green(level.toUpperCase())}: ${chalk.cyan(
-            `[${logMessage.type}] [${logMessage.reqId}] [${logMessage.userId + '|' + logMessage.userNickname}] [${
-                logMessage.event
-            }]: ${chalk.yellow(logMessage.respTime ? logMessage.respTime + 'ms' : '')}`
+            `[${logMessage.method}] [${logMessage.type}] [${logMessage.reqId}] [${
+                logMessage.userId + '|' + logMessage.userNickname
+            }] [${logMessage.event}]: ${chalk.yellow(logMessage.respTime ? logMessage.respTime + 'ms' : '')}`
         )} ${chalk.gray(
             JSON.stringify({
                 body: logMessage.body,
                 meta: logMessage.meta,
                 err: logMessage.err,
-                method: logMessage.method,
                 errStack: logMessage.errStack
             })
         )}`;

@@ -10,4 +10,7 @@ export interface Environment {
     ELASTICSEARCH_NODE: string;
     ELASTICSEARCH_USERNAME: string;
     ELASTICSEARCH_PASSWORD: string;
+    RABBITMQ_NODE_CONNECTION_URL: string;
+    RABBITMQ_EXCHANGES_NAME: string;
+    RABBITMQ_EXCHANGE_TYPE: string;
 }

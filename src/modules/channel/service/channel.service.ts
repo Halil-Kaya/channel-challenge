@@ -16,6 +16,9 @@ import { ChannelSearchService } from '../../utils/elastic-search/services/channe
 import { ChannelNotFoundException, RaceConditionException } from '../../../core/error';
 import { LockService } from '../../../core/service';
 import { cacheKeys, cacheTTL } from '../../../core/cache';
+import { EventPublisher } from '../../utils/rabbitmq/service/event-publisher';
+import { ChannelJoinedBroadcastEvent } from '../broadcast';
+import { ChannelBroadcast } from '../../../core/enum';
 
 @Injectable()
 export class ChannelService {
@@ -24,6 +27,7 @@ export class ChannelService {
         private readonly channelUserInternalService: ChannelUserInternalService,
         private readonly channelSearchService: ChannelSearchService,
         private readonly lockService: LockService,
+        private readonly eventPublisher: EventPublisher,
         @InjectConnection() private readonly mongoConnection: Connection
     ) {}
 
@@ -70,7 +74,7 @@ export class ChannelService {
         });
     }
 
-    async join({ payload, client }: SocketEmit<ChannelJoinEmit>): Promise<ChannelJoinAck> {
+    async join({ payload, client, reqId }: SocketEmit<ChannelJoinEmit>): Promise<ChannelJoinAck> {
         const { channelId } = payload;
 
         let lock;
@@ -99,9 +103,15 @@ export class ChannelService {
             role: ChannelUserRole.SUBSCRIBER,
             status: ChannelUserStatus.ACTIVE
         });
-        //TODO send event to another users
-
         await lock.release();
+
+        this.eventPublisher.publish<ChannelJoinedBroadcastEvent>(ChannelBroadcast.CHANNEL_JOINED, {
+            client,
+            reqId,
+            payload: {
+                channel
+            }
+        });
         return;
     }
 }

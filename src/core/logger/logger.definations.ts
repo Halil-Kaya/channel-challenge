@@ -24,7 +24,7 @@ export interface LogParameters {
         nickname?: string;
     };
     event?: string;
-    method?: 'POST' | 'GET' | 'PATCH' | 'SOCKET';
+    method?: 'POST' | 'GET' | 'PATCH' | 'SOCKET' | 'RABBITMQ';
     message?: string;
     meta?: Record<string, any>;
     err?: CustomException & {

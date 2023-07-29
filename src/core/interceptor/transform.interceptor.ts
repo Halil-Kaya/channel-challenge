@@ -4,6 +4,7 @@ import { maskHelper } from '../helper';
 import { logger } from '../logger/logger';
 import { CryptoService } from '../service';
 import { UnauthorizedException } from '../error';
+import { isRabbitContext } from '@golevelup/nestjs-rabbitmq';
 
 export interface MetaInterface {
     headers: any;
@@ -25,6 +26,19 @@ export class TransformInterceptor implements NestInterceptor {
 
     intercept(context: ExecutionContext, next: CallHandler): Observable<string> {
         try {
+            if (isRabbitContext(context)) {
+                const args = context.getArgs();
+                const payload = args[0];
+                const { routingKey } = args[1].fields;
+                logger.info({
+                    reqId: payload.reqId,
+                    type: 'EMIT',
+                    event: routingKey,
+                    body: payload,
+                    method: 'RABBITMQ'
+                });
+                return next.handle();
+            }
             const request = context.switchToHttp().getRequest();
             const { body, headers, params, status } = request;
             request.body = this.cryptoService.decrypt(body.data);

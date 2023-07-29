@@ -56,14 +56,26 @@ services:
     mongo-db:
         image: mongo
         ports:
-            - 27016:27017
+            - '27016:27017'
         networks:
             - app-net
 
     redis-db:
         image: redis
         ports:
-            - 6378:6379
+            - '6378:6379'
+        networks:
+            - app-net
+
+    rabbitmq:
+        image: rabbitmq:management
+        container_name: rabbitmq
+        environment:
+            - RABBITMQ_DEFAULT_USER=guest
+            - RABBITMQ_DEFAULT_PASS=guest
+        ports:
+            - '5672:5672'
+            - '15672:15672'
         networks:
             - app-net
 
@@ -85,7 +97,7 @@ services:
         volumes:
             - data01:/usr/share/elasticsearch/data
         ports:
-            - 9200:9200
+            - '9200:9200'
         networks:
             - app-net
     es02:

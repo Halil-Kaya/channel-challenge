@@ -83,7 +83,7 @@ export class ServerGateway implements OnGatewayInit, OnGatewayConnection, OnGate
                         respTime: Date.now() - startTime,
                         event
                     });
-                    callBack(null, this.cryptoService.encrypt(response));
+                    callBack(null, this.cryptoService.encrypt(response || {}));
                 } catch (err) {
                     logger.warn({
                         event,
