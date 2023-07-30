@@ -4,10 +4,11 @@ import { NodeIdHelper } from '../../../core/helper';
 import { RabbitmqQueueuHandler } from '../../../core/decorator';
 import { SocketEmitBroadcast } from '../../../core/enum';
 import { ChannelJoinedSocketEmitEvent, ChannelLeftSocketEmitEvent, SocketEmitEvent } from '../../../core/interface';
+import { CryptoService } from '../../../core/service';
 
 @Injectable()
 export class SocketBroadcastEmitHandler {
-    constructor(private readonly serverGateway: ServerGateway) {}
+    constructor(private readonly serverGateway: ServerGateway, private readonly crpytoService: CryptoService) {}
 
     @RabbitmqQueueuHandler(SocketEmitBroadcast.CHANNEL_JOINED)
     async joinChannel({ userSession, payload }: SocketEmitEvent<ChannelJoinedSocketEmitEvent>) {
@@ -22,7 +23,8 @@ export class SocketBroadcastEmitHandler {
     }
 
     @RabbitmqQueueuHandler(NodeIdHelper.getNodeId())
-    async handleIndividual({ payload, reqId, userSession, event }: SocketEmitEvent<any>) {
-        console.log('SocketBroadcastEmitHandler,handleIndividual -> ', {});
+    async handleIndividual({ payload, userSession, event }: SocketEmitEvent<any>) {
+        const socket = this.serverGateway.getSocketById(userSession.socketId);
+        socket.emit(event, this.crpytoService.encrypt(payload));
     }
 }

@@ -74,7 +74,8 @@ export class EventPublisher implements OnModuleInit {
                             method: 'RABBITMQ',
                             body,
                             event: queueName,
-                            reqId: body.reqId
+                            reqId: body.reqId,
+                            type: 'ACK'
                         });
                         const boundHandler = this.handlersMap.get(queueName);
                         await boundHandler(body);
@@ -87,7 +88,8 @@ export class EventPublisher implements OnModuleInit {
                             event: queueName,
                             err,
                             message: 'Rabbitmq - could not consume event',
-                            reqId: body.reqId
+                            reqId: body.reqId,
+                            type: 'ACK'
                         });
                         this.amqpConnection.channels['pubSub'].reject(msg, false);
                     }
