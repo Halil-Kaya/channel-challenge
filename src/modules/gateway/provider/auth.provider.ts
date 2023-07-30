@@ -11,12 +11,12 @@ export class AuthProvider {
         private readonly userSessionInternalService: UserSessionInternalService
     ) {}
 
-    async auth(token: string) {
+    async auth(token: string, socketId: string) {
         const user = await this.authService.getUserByToken(token);
         if (!user) {
             throw new UnauthorizedException();
         }
-        await this.userSessionInternalService.save(user);
+        await this.userSessionInternalService.save(user,socketId);
         return user;
     }
 

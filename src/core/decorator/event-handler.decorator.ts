@@ -1,8 +1,9 @@
-type EventHandlerOptions = {};
+import { DecoratorMetaKey } from '../enum';
+
 export const EventHandler = (eventName: string): MethodDecorator => {
     return (target, key, descriptor) => {
         Reflect.defineMetadata(
-            'EVENT_HANDLER',
+            DecoratorMetaKey.EVENT_HANDLER,
             {
                 event: eventName
             },

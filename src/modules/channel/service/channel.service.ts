@@ -8,7 +8,7 @@ import {
     ChannelSearchAck,
     ChannelSearchEmit
 } from '../emit';
-import { ChannelUserRole, ChannelUserStatus, SocketEmit } from '../../../core/interface';
+import { ChannelJoinedBroadcastEvent, ChannelUserRole, ChannelUserStatus, SocketEmit } from '../../../core/interface';
 import { ChannelUserInternalService } from '../../channel-user/service/channel-user-internal.service';
 import { Connection } from 'mongoose';
 import { InjectConnection } from '@nestjs/mongoose';
@@ -17,7 +17,6 @@ import { ChannelNotFoundException, RaceConditionException } from '../../../core/
 import { LockService } from '../../../core/service';
 import { cacheKeys, cacheTTL } from '../../../core/cache';
 import { EventPublisher } from '../../utils/rabbitmq/service/event-publisher';
-import { ChannelJoinedBroadcastEvent } from '../broadcast';
 import { ChannelBroadcast } from '../../../core/enum';
 
 @Injectable()
@@ -104,7 +103,7 @@ export class ChannelService {
             status: ChannelUserStatus.ACTIVE
         });
         await lock.release();
-        this.eventPublisher.publish<ChannelJoinedBroadcastEvent>(ChannelBroadcast.CHANNEL_JOINED, {
+        this.eventPublisher.publishToBroadcast<ChannelJoinedBroadcastEvent>(ChannelBroadcast.CHANNEL_JOINED, {
             client,
             reqId,
             payload: {

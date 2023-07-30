@@ -12,6 +12,7 @@ import { AuthProvider } from '../provider/auth.provider';
 import { SocketMiddleware } from '../middleware';
 import { DiscoveryService } from '@golevelup/nestjs-discovery';
 import { SocketEmit } from '../../../core/interface';
+import { DecoratorMetaKey } from '../../../core/enum';
 
 @WebSocketGateway({
     transports: ['websocket'],
@@ -51,7 +52,7 @@ export class ServerGateway implements OnGatewayInit, OnGatewayConnection, OnGate
                 const startTime = Date.now();
                 const { token } = <{ token: string }>this.cryptoService.decrypt(socket.handshake?.query?.data + '');
                 socket.data['connectionTime'] = Date.now();
-                socket.data.user = await this.authProvider.auth(token);
+                socket.data.user = await this.authProvider.auth(token, socket.id);
                 logger.info({
                     reqId: socket.id,
                     user: socket.data.user,
@@ -88,7 +89,7 @@ export class ServerGateway implements OnGatewayInit, OnGatewayConnection, OnGate
     }
 
     private async registerHandlers(socket: Socket) {
-        const methods = await this.discoveryService.providerMethodsWithMetaAtKey('EVENT_HANDLER');
+        const methods = await this.discoveryService.providerMethodsWithMetaAtKey(DecoratorMetaKey.EVENT_HANDLER);
         for (const method of methods) {
             const meta = method.meta as { event: string };
             const event = meta.event;

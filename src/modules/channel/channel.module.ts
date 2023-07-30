@@ -7,9 +7,9 @@ import { ChannelFactory } from './model/channel.model';
 import { ChannelUserModule } from '../channel-user/channel-user.module';
 import { ElasticSearchModule } from '../utils/elastic-search/elastic-search.module';
 import { LockService } from '../../core/service';
-import { ChannelJoinedBroadcast } from './broadcast';
 import { CustomRabbitMqModule } from '../utils/rabbitmq/rabbitmq.module';
 import { UserModule } from '../user/user.module';
+import { ChannelBroadcastHandler } from './broadcast/channel-broadcast.handler';
 
 @Module({
     imports: [
@@ -26,7 +26,7 @@ import { UserModule } from '../user/user.module';
         ChannelMongoRepository,
         ChannelCacheRepository,
         LockService,
-        ChannelJoinedBroadcast
+        ChannelBroadcastHandler
     ],
     exports: []
 })

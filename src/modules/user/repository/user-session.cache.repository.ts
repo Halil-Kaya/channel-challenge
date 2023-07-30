@@ -9,8 +9,8 @@ import { NodeIdHelper } from '../../../core/helper';
 export class UserSessionCacheRepository {
     constructor(@InjectRedis() private readonly redis: Redis) {}
 
-    async save(user: Omit<User, 'password'>): Promise<void> {
-        const userSession = this.convertUserToSessionUserObjcet(user);
+    async save(user: Omit<User, 'password'>, socketId: string): Promise<void> {
+        const userSession = this.convertUserToSessionUserObjcet(user, socketId);
         await this.redis.hset(cacheKeys.session_user(user._id), this.serializeUserSession(userSession));
     }
 
@@ -25,11 +25,12 @@ export class UserSessionCacheRepository {
         return this.deserializeUserSession(userSessionCache);
     }
 
-    private convertUserToSessionUserObjcet(user: Omit<User, 'password'>): UserSession {
+    private convertUserToSessionUserObjcet(user: Omit<User, 'password'>, socketId: string): UserSession {
         return {
             userId: user._id.toString(),
             nickname: user.nickname,
-            nodeId: NodeIdHelper.getNodeId()
+            nodeId: NodeIdHelper.getNodeId(),
+            socketId: socketId
         };
     }
 

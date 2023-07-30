@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { EventHandler } from '../../../core/decorator';
-import { ChannelEvents } from '../../../core/enum/channel-gateway.enum';
+import { ChannelEvents } from "../../../core/enum";
 import { SocketEmit } from '../../../core/interface';
 import {
     ChannelCreateAck,

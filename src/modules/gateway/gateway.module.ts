@@ -12,7 +12,7 @@ import {
     SocketMiddleware
 } from './middleware';
 import { UserModule } from '../user/user.module';
-import { SocketEmitService } from './service/socket-emit.service';
+import { SocketBroadcastEmitHandler } from './broadcast/socket-broadcast-emit.handler';
 import { CustomRabbitMqModule } from '../utils/rabbitmq/rabbitmq.module';
 
 @Module({
@@ -27,7 +27,7 @@ import { CustomRabbitMqModule } from '../utils/rabbitmq/rabbitmq.module';
         CurrentUserMiddleware,
         LoggerMiddleware,
         DecryptMiddleware,
-        SocketEmitService
+        SocketBroadcastEmitHandler
     ]
 })
 export class GatewayModule {}

@@ -1,4 +1,4 @@
-import { haveUsers } from '../../common';
+import { haveUsers, sleep } from '../../common';
 import { createChannel, joinChannel } from '../../common/channel.helper';
 import { customUsers } from '../../test-setup';
 
@@ -10,4 +10,6 @@ it('Should user join channel', async () => {
     await joinChannel(B.client, {
         channelId
     });
+
+    await sleep(3000);
 });
