@@ -37,7 +37,10 @@ export class EventPublisher implements OnModuleInit {
                     event: queueName,
                     body: payload,
                     reqId: payload.reqId,
-                    user: payload.userSession,
+                    user: payload.client,
+                    meta: {
+                        userSession: payload.userSession
+                    },
                     method: 'RABBITMQ',
                     type: 'EMIT',
                     message: 'Rabbitmq - could not send socket emit event'
@@ -68,11 +71,11 @@ export class EventPublisher implements OnModuleInit {
                 await this.amqpConnection.managedChannels['pubSub'].consume(queueName, async (msg) => {
                     const fields = msg.fields;
                     const body: SocketEmitEvent<any> | BroadcastEvent<any> = JSON.parse(msg.content.toString());
-                    //TODO: log client info
                     try {
                         logger.info({
                             method: 'RABBITMQ',
                             body,
+                            user: body.client,
                             event: queueName,
                             reqId: body.reqId,
                             type: 'ACK'
@@ -86,6 +89,7 @@ export class EventPublisher implements OnModuleInit {
                             meta: { fields, queueName },
                             body,
                             event: queueName,
+                            user: body.client,
                             err,
                             message: 'Rabbitmq - could not consume event',
                             reqId: body.reqId,
