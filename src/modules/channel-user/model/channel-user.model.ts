@@ -1,6 +1,7 @@
 import { Document, Schema as MongooseSchema, Types } from 'mongoose';
 import { AsyncModelFactory, Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ChannelUser, ChannelUserRole, ChannelUserStatus, CollectionName } from '../../../core/interface';
+import { leanObjectId } from '../../../core/helper';
 
 export type ChannelUserDocument = ChannelUserModel & Document;
 
@@ -41,12 +42,6 @@ ChannelUserSchema.index(
 );
 ChannelUserSchema.index({ channelId: 1, status: 1 }, { background: true, name: ChannelUserIndexes.CHANNEL_ID_STATUS });
 ChannelUserSchema.index({ channelId: 1, userId: 1 }, { background: true, name: ChannelUserIndexes.CHANNEL_ID_USER_ID });
-
-function leanObjectId(result) {
-    if (result) {
-        result._id = result._id.toString();
-    }
-}
 
 export const ChannelUserFactory: AsyncModelFactory = {
     collection: CollectionName.CHANNEL_USER,

@@ -1,7 +1,7 @@
 import { Document, Schema as MongooseSchema, Types } from 'mongoose';
 import { AsyncModelFactory, Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { CollectionName, User } from '../../../core/interface';
-import { hashSync } from 'bcryptjs';
+import { leanObjectId, preSave } from '../../../core/helper';
 
 export type UserDocument = UserModel & Document;
 
@@ -32,20 +32,6 @@ export enum UserIndexes {
 export const UserSchema = SchemaFactory.createForClass(UserModel);
 
 UserSchema.index({ nickname: 1 }, { background: true, name: UserIndexes.NICKNAME });
-
-function preSave(next: any) {
-    if (!this.isModified('password')) {
-        return next();
-    }
-    this.password = hashSync(this.password, 12);
-    next();
-}
-
-function leanObjectId(result) {
-    if (result) {
-        result._id = result._id.toString();
-    }
-}
 
 export const UserFactory: AsyncModelFactory = {
     collection: CollectionName.USER,
