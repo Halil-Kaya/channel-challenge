@@ -17,7 +17,8 @@ const consoleLogFormat = winston.format.combine(
                     body: logMessage.body,
                     meta: logMessage.meta,
                     err: logMessage.err,
-                    errStack: logMessage.errStack
+                    errStack: logMessage.errStack,
+                    content: logMessage.content
                 })
             )}`;
         }
@@ -35,7 +36,8 @@ const consoleLogFormat = winston.format.combine(
                     body: logMessage.body,
                     meta: logMessage.meta,
                     err: logMessage.err,
-                    errStack: logMessage.errStack
+                    errStack: logMessage.errStack,
+                    content: logMessage.content
                 })
             )} ${logMessage.err?.stack}`;
         }
@@ -49,7 +51,8 @@ const consoleLogFormat = winston.format.combine(
                     body: logMessage.body,
                     meta: logMessage.meta,
                     err: logMessage.err,
-                    errStack: logMessage.errStack
+                    errStack: logMessage.errStack,
+                    content: logMessage.content
                 })
             )}`;
         }
@@ -62,7 +65,8 @@ const consoleLogFormat = winston.format.combine(
                 body: logMessage.body,
                 meta: logMessage.meta,
                 err: logMessage.err,
-                errStack: logMessage.errStack
+                errStack: logMessage.errStack,
+                content: logMessage.content
             })
         )}`;
     })
@@ -112,7 +116,7 @@ export type WintstonLogParameter = {
     userNickname?: string;
     event?: string;
     method?: 'POST' | 'GET' | 'PATCH' | 'SOCKET';
-    message?: string;
+    content?: string;
     meta?: Record<string, any>;
     err?: {
         errorCode: number;

@@ -12,7 +12,7 @@ function createLogger() {
 }
 
 function logWithLevel(level: LogLevel, params: LogParameters): void {
-    let { req, user, method, type, respTime, reqId, meta, err, event, body, message } = params;
+    let { req, user, method, type, respTime, reqId, meta, err, event, body, content } = params;
     let errStack;
     let customError;
     if (err) {
@@ -31,6 +31,6 @@ function logWithLevel(level: LogLevel, params: LogParameters): void {
         errStack,
         body,
         meta,
-        message
+        content
     });
 }

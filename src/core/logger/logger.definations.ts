@@ -25,7 +25,7 @@ export interface LogParameters {
     };
     event?: string;
     method?: 'POST' | 'GET' | 'PATCH' | 'SOCKET' | 'RABBITMQ';
-    message?: string;
+    content?: string;
     meta?: Record<string, any>;
     err?: CustomException & {
         errorCode: number;

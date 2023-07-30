@@ -13,6 +13,7 @@ export class SocketBroadcastEmitHandler {
     @RabbitmqQueueuHandler(SocketEmitBroadcast.CHANNEL_JOINED)
     private async joinChannel({ userSession, payload }: SocketEmitEvent<ChannelJoinedSocketEmitEvent>) {
         const socket = this.serverGateway.getSocketById(userSession.socketId);
+        console.log({ socket });
         socket.join(payload.channelId);
     }
 

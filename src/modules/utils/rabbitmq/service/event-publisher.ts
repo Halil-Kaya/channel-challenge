@@ -23,7 +23,7 @@ export class EventPublisher implements OnModuleInit {
                     user: payload.client,
                     method: 'RABBITMQ',
                     type: 'EMIT',
-                    message: 'Rabbitmq - could not send broadcast event'
+                    content: 'Rabbitmq - could not send broadcast event'
                 });
             });
     }
@@ -43,7 +43,7 @@ export class EventPublisher implements OnModuleInit {
                     },
                     method: 'RABBITMQ',
                     type: 'EMIT',
-                    message: 'Rabbitmq - could not send socket emit event'
+                    content: 'Rabbitmq - could not send socket emit event'
                 });
             });
     }
@@ -84,6 +84,7 @@ export class EventPublisher implements OnModuleInit {
                         await boundHandler(body);
                         this.amqpConnection.channels['pubSub'].ack(msg, false);
                     } catch (err) {
+                        console.log({ err });
                         logger.error({
                             method: 'RABBITMQ',
                             meta: { fields, queueName },
@@ -91,7 +92,6 @@ export class EventPublisher implements OnModuleInit {
                             event: queueName,
                             user: body.client,
                             err,
-                            message: 'Rabbitmq - could not consume event',
                             reqId: body.reqId,
                             type: 'ACK'
                         });
