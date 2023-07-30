@@ -1,7 +1,8 @@
-import { decrypt, encrypt, haveUsers, sleep } from '../../common';
+import { ChannelMongoModel, ChannelUserMongoModel, decrypt, encrypt, haveUsers, sleep } from '../../common';
 import { ChannelCreateAck, ChannelCreateEmit } from '../../../src/modules/channel/emit';
 import { customUsers } from '../../test-setup';
 import { ChannelEvents } from '../../../src/core/enum';
+import { ChannelUserRole, ChannelUserStatus } from '../../../src/core/interface';
 
 it('Should user create channel', async () => {
     const [A] = await haveUsers(1);
@@ -25,4 +26,17 @@ it('Should user create channel', async () => {
         await sleep(200);
         rej();
     });
+    const createdChannel = await ChannelMongoModel.findOne().lean().exec();
+    expect(createdChannel).toBeDefined();
+    expect(createdChannel.owner).toBe(A.user._id);
+
+    const channelUser = await ChannelUserMongoModel.findOne({
+        channelId: createdChannel._id,
+        userId: A.user._id
+    })
+        .lean()
+        .exec();
+    expect(channelUser).toBeDefined();
+    expect(channelUser.role).toBe(ChannelUserRole.OWNER);
+    expect(channelUser.status).toBe(ChannelUserStatus.ACTIVE);
 });

@@ -10,3 +10,7 @@ export interface BroadcastEvent<T> {
 export interface ChannelJoinedBroadcastEvent {
     channel: Channel;
 }
+
+export interface ChannelLeftBroadcastEvent {
+    channelId: string;
+}

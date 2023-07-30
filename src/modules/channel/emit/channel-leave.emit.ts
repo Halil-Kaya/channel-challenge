@@ -1,3 +1,5 @@
-export class ChannelLeaveEmit {}
+export class ChannelLeaveEmit {
+    channelId: string;
+}
 
 export class ChannelLeaveAck {}

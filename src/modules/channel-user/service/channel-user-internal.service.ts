@@ -8,11 +8,11 @@ export class ChannelUserInternalService {
     constructor(private readonly channelUserRepository: ChannelUserRepository) {}
 
     findOneAndUpdate(
-        channelId: string,
+        filter : Partial<ChannelUser>,
         payload: Partial<Omit<ChannelUser, '_id' | 'createdAt'>>,
         session?: ClientSession
     ): Promise<ChannelUser> {
-        return this.channelUserRepository.findOneAndUpdate(channelId, payload, session);
+        return this.channelUserRepository.findOneAndUpdate(filter, payload, session);
     }
 
     async isInChannel(userId: string, channelId: string): Promise<boolean> {

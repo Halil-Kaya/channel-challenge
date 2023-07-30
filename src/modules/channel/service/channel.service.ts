@@ -10,7 +10,13 @@ import {
     ChannelSearchAck,
     ChannelSearchEmit
 } from '../emit';
-import { ChannelJoinedBroadcastEvent, ChannelUserRole, ChannelUserStatus, SocketEmit } from '../../../core/interface';
+import {
+    ChannelJoinedBroadcastEvent,
+    ChannelLeftBroadcastEvent,
+    ChannelUserRole,
+    ChannelUserStatus,
+    SocketEmit
+} from '../../../core/interface';
 import { ChannelUserInternalService } from '../../channel-user/service/channel-user-internal.service';
 import { Connection } from 'mongoose';
 import { InjectConnection } from '@nestjs/mongoose';
@@ -80,12 +86,12 @@ export class ChannelService {
 
         let lock;
         try {
-            lock = await this.lockService.lock(cacheKeys.channel_join(payload.channelId, client._id), {
+            lock = await this.lockService.lock(cacheKeys.channel_join(channelId, client._id), {
                 ttl: cacheTTL.lock.channel_join,
                 noRetry: true
             });
         } catch (err) {
-            throw new RaceConditionException(`RaceCond: ${cacheKeys.channel_join(payload.channelId, client._id)}`);
+            throw new RaceConditionException(`RaceCond: ${cacheKeys.channel_join(channelId, client._id)}`);
         }
 
         const channel = await this.channelRepository.findById(channelId);
@@ -97,12 +103,16 @@ export class ChannelService {
             return;
         }
 
-        await this.channelUserInternalService.findOneAndUpdate(channel._id, {
-            channelId: channel._id,
-            userId: channel.owner,
-            role: ChannelUserRole.SUBSCRIBER,
-            status: ChannelUserStatus.ACTIVE
-        });
+        await this.channelUserInternalService.findOneAndUpdate(
+            {
+                channelId: channel._id,
+                userId: client._id
+            },
+            {
+                role: ChannelUserRole.SUBSCRIBER,
+                status: ChannelUserStatus.ACTIVE
+            }
+        );
         await lock.release();
         this.eventPublisher.publishToBroadcast<ChannelJoinedBroadcastEvent>(ChannelBroadcast.CHANNEL_JOINED, {
             client,
@@ -114,7 +124,43 @@ export class ChannelService {
         return;
     }
 
-    async leave({}: SocketEmit<ChannelLeaveEmit>): Promise<ChannelLeaveAck> {
+    async leave({ payload, client, reqId }: SocketEmit<ChannelLeaveEmit>): Promise<ChannelLeaveAck> {
+        const { channelId } = payload;
+        let lock;
+        try {
+            lock = await this.lockService.lock(cacheKeys.channel_leave(channelId, client._id), {
+                ttl: cacheTTL.lock.channel_join,
+                noRetry: true
+            });
+        } catch (err) {
+            throw new RaceConditionException(`RaceCond: ${cacheKeys.channel_join(channelId, client._id)}`);
+        }
+        const channel = await this.channelRepository.findById(channelId);
+        if (!channel) {
+            throw new ChannelNotFoundException();
+        }
+
+        const isInChannel = await this.channelUserInternalService.isInChannel(client._id, channelId);
+        if (!isInChannel) {
+            return;
+        }
+        await this.channelUserInternalService.findOneAndUpdate(
+            {
+                channelId: channel._id,
+                userId: client._id
+            },
+            {
+                status: ChannelUserStatus.REMOVED
+            }
+        );
+        await lock.release();
+        this.eventPublisher.publishToBroadcast<ChannelLeftBroadcastEvent>(ChannelBroadcast.CHANNEL_LEFT, {
+            reqId,
+            client,
+            payload: {
+                channelId
+            }
+        });
         return;
     }
 }

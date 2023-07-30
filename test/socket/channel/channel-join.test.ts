@@ -1,8 +1,8 @@
-import { decrypt, haveUsers, sleep } from '../../common';
+import { ChannelUserMongoModel, decrypt, haveUsers, sleep } from '../../common';
 import { createChannel, joinChannel } from '../../common/channel.helper';
 import { customUsers } from '../../test-setup';
-import { BackendOrginated } from '../../../src/core/enum/backend-originated.enum';
-import { ChannelJoinedSocketEmitEvent } from '../../../src/core/interface';
+import { BackendOriginated } from '../../../src/core/enum/backend-originated.enum';
+import { ChannelJoinedSocketEmitEvent, ChannelUserRole, ChannelUserStatus } from '../../../src/core/interface';
 import { Types } from 'mongoose';
 import { MetaInterface } from '../../../src/core/interceptor';
 import { ErrorCode } from '../../../src/core/error';
@@ -17,7 +17,7 @@ it('Should user join channel and joined user should receive channel joined event
     });
     await Promise.all([
         new Promise<void>((res) => {
-            B.client.on(BackendOrginated.CHANNEL_JOINED, (response) => {
+            B.client.on(BackendOriginated.CHANNEL_JOINED, (response) => {
                 const result = <ChannelJoinedSocketEmitEvent>decrypt(response);
                 expect(result.channelId).toBe(channelId);
                 expect(result.name).toBe(name);
@@ -27,13 +27,24 @@ it('Should user join channel and joined user should receive channel joined event
             });
         }),
         new Promise<void>(async (res, rej) => {
-            A.client.on(BackendOrginated.CHANNEL_JOINED, () => {
+            A.client.on(BackendOriginated.CHANNEL_JOINED, () => {
                 rej();
             });
             await sleep(250);
             res();
         })
     ]);
+
+    const [channelUsersA, channelUsersB] = await Promise.all([
+        ChannelUserMongoModel.findOne({ userId: A.user._id }).lean().exec(),
+        ChannelUserMongoModel.findOne({ userId: B.user._id }).lean().exec()
+    ]);
+    expect(channelUsersA.role).toBe(ChannelUserRole.OWNER);
+    expect(channelUsersA.channelId).toBe(channelId);
+    expect(channelUsersA.status).toBe(ChannelUserStatus.ACTIVE);
+    expect(channelUsersB.role).toBe(ChannelUserRole.SUBSCRIBER);
+    expect(channelUsersB.channelId).toBe(channelId);
+    expect(channelUsersB.status).toBe(ChannelUserStatus.ACTIVE);
 });
 
 it('should throw error if channel is not exist', async () => {

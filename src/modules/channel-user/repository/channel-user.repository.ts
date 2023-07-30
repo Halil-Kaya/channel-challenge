@@ -9,14 +9,14 @@ export class ChannelUserRepository {
     constructor(@InjectModel(ChannelUserModel.name) private readonly channelUserModel: Model<ChannelUserDocument>) {}
 
     findOneAndUpdate(
-        channelId: string,
+        filter: Partial<ChannelUser>,
         payload: Partial<Omit<ChannelUser, '_id' | 'createdAt'>>,
         session?: ClientSession
     ): Promise<ChannelUser> {
         return this.channelUserModel
             .findOneAndUpdate(
                 {
-                    _id: channelId
+                    ...filter
                 },
                 {
                     $set: {

@@ -4,6 +4,8 @@ import {
     ChannelCreateEmit,
     ChannelJoinAck,
     ChannelJoinEmit,
+    ChannelLeaveAck,
+    ChannelLeaveEmit,
     ChannelSearchAck,
     ChannelSearchEmit
 } from '../../src/modules/channel/emit';
@@ -43,6 +45,17 @@ export const searchChannel = async (client: Socket, dto: ChannelSearchEmit): Pro
 export const joinChannel = async (client: Socket, dto: ChannelJoinEmit): Promise<ChannelJoinAck> => {
     return new Promise((res, rej) => {
         client.emit(ChannelEvents.CHANNEL_JOIN, encrypt(dto), (error, response) => {
+            if (error) {
+                rej(decrypt(error));
+            }
+            res(decrypt(response));
+        });
+    });
+};
+
+export const leaveChannel = async (client: Socket, dto: ChannelLeaveEmit): Promise<ChannelLeaveAck> => {
+    return new Promise((res, rej) => {
+        client.emit(ChannelEvents.CHANNEL_LEAVE, encrypt(dto), (error, response) => {
             if (error) {
                 rej(decrypt(error));
             }

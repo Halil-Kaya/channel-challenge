@@ -2,9 +2,15 @@ import { Injectable } from '@nestjs/common';
 import { ChannelBroadcast, SocketEmitBroadcast } from '../../../core/enum';
 import { EventPublisher } from '../../utils/rabbitmq/service/event-publisher';
 import { UserSessionInternalService } from '../../user/service';
-import { BackendOrginated } from '../../../core/enum/backend-originated.enum';
+import { BackendOriginated } from '../../../core/enum/backend-originated.enum';
 import { RabbitmqQueueuHandler } from '../../../core/decorator';
-import { BroadcastEvent, ChannelJoinedBroadcastEvent, ChannelJoinedSocketEmitEvent } from '../../../core/interface';
+import {
+    BroadcastEvent,
+    ChannelJoinedBroadcastEvent,
+    ChannelJoinedSocketEmitEvent,
+    ChannelLeftBroadcastEvent,
+    ChannelLeftSocketEmitEvent
+} from '../../../core/interface';
 
 @Injectable()
 export class ChannelBroadcastHandler {
@@ -14,7 +20,7 @@ export class ChannelBroadcastHandler {
     ) {}
 
     @RabbitmqQueueuHandler(ChannelBroadcast.CHANNEL_JOINED)
-    public async handleChannelJoined({ client, payload, reqId }: BroadcastEvent<ChannelJoinedBroadcastEvent>) {
+    private async handleChannelJoined({ client, payload, reqId }: BroadcastEvent<ChannelJoinedBroadcastEvent>) {
         const userSession = await this.userSessionIntervalService.getSessionUser(client._id);
         this.eventPublisher.publishToSocket<ChannelJoinedSocketEmitEvent>(SocketEmitBroadcast.CHANNEL_JOINED, {
             reqId,
@@ -38,7 +44,21 @@ export class ChannelBroadcastHandler {
                 description: payload.channel.description,
                 createdAt: payload.channel.createdAt
             },
-            event: BackendOrginated.CHANNEL_JOINED
+            event: BackendOriginated.CHANNEL_JOINED
+        });
+    }
+
+    @RabbitmqQueueuHandler(ChannelBroadcast.CHANNEL_LEFT)
+    private async handleChannelLeft({ client, payload, reqId }: BroadcastEvent<ChannelLeftBroadcastEvent>) {
+        const userSession = await this.userSessionIntervalService.getSessionUser(client._id);
+        this.eventPublisher.publishToSocket<ChannelLeftSocketEmitEvent>(userSession.nodeId, {
+            reqId,
+            userSession,
+            client,
+            payload: {
+                channelId: payload.channelId
+            },
+            event: BackendOriginated.CHANNEL_LEFT
         });
     }
 }
