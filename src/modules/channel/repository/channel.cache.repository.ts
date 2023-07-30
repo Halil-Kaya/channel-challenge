@@ -3,6 +3,7 @@ import { InjectRedis } from '@nestjs-modules/ioredis';
 import Redis from 'ioredis';
 import { Channel, SerializedChannel } from '../../../core/interface';
 import { cacheKeys, cacheTTL } from '../../../core/cache';
+import { isObjEmpty } from '../../../core/helper';
 
 @Injectable()
 export class ChannelCacheRepository {
@@ -18,7 +19,7 @@ export class ChannelCacheRepository {
     async getChannelById(channelId: string): Promise<Channel> {
         const cacheKey = cacheKeys.channel(channelId);
         const channelCache: SerializedChannel = <SerializedChannel>await this.redis.hgetall(cacheKey);
-        if (!channelCache) {
+        if (!channelCache || isObjEmpty(channelCache)) {
             return null;
         }
         return this.deserializeChannel(channelCache);

@@ -4,6 +4,7 @@ import { InjectRedis } from '@nestjs-modules/ioredis';
 import Redis from 'ioredis';
 import { cacheKeys, cacheTTL } from '../../../core/cache';
 import { SerializedUser } from '../../../core/interface';
+import { isObjEmpty } from '../../../core/helper';
 
 @Injectable()
 export class UserCacheRepository {
@@ -22,7 +23,7 @@ export class UserCacheRepository {
     async getUserById(userId: string): Promise<Omit<User, 'password'>> {
         const cacheKey = cacheKeys.user(userId);
         const userCache: SerializedUser = <SerializedUser>await this.redis.hgetall(cacheKey);
-        if (!userCache) {
+        if (!userCache || isObjEmpty(userCache)) {
             return null;
         }
         return this.deserializeUser(userCache);

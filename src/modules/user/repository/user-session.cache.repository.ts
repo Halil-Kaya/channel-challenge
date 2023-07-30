@@ -3,7 +3,7 @@ import { UserSession, User, SerializedUserSession } from '../../../core/interfac
 import { InjectRedis } from '@nestjs-modules/ioredis';
 import Redis from 'ioredis';
 import { cacheKeys } from '../../../core/cache';
-import { NodeIdHelper } from '../../../core/helper';
+import { isObjEmpty, NodeIdHelper } from '../../../core/helper';
 
 @Injectable()
 export class UserSessionCacheRepository {
@@ -22,6 +22,9 @@ export class UserSessionCacheRepository {
         const userSessionCache: SerializedUserSession = <SerializedUserSession>(
             await this.redis.hgetall(cacheKeys.session_user(userId))
         );
+        if (!userSessionCache || isObjEmpty(userSessionCache)) {
+            return null;
+        }
         return this.deserializeUserSession(userSessionCache);
     }
 

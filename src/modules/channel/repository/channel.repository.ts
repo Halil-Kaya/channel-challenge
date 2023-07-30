@@ -22,6 +22,7 @@ export class ChannelRepository {
         if (channelCache) {
             return channelCache;
         }
+
         const channelMongo = await this.channelMongoRepository.findById(channelId);
         if (channelMongo) {
             await this.channelCacheRepository.save(channelMongo);

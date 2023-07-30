@@ -86,14 +86,13 @@ export class ChannelService {
             throw new RaceConditionException(`RaceCond: ${cacheKeys.channel_join(payload.channelId, client._id)}`);
         }
 
-        const isInChannel = await this.channelUserInternalService.isInChannel(client._id, channelId);
-        if (isInChannel) {
-            return;
-        }
-
         const channel = await this.channelRepository.findById(channelId);
         if (!channel) {
             throw new ChannelNotFoundException();
+        }
+        const isInChannel = await this.channelUserInternalService.isInChannel(client._id, channelId);
+        if (isInChannel) {
+            return;
         }
 
         await this.channelUserInternalService.findOneAndUpdate(channel._id, {

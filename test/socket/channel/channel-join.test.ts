@@ -3,6 +3,9 @@ import { createChannel, joinChannel } from '../../common/channel.helper';
 import { customUsers } from '../../test-setup';
 import { BackendOrginated } from '../../../src/core/enum/backend-originated.enum';
 import { ChannelJoinedSocketEmitEvent } from '../../../src/core/interface';
+import { Types } from 'mongoose';
+import { MetaInterface } from '../../../src/core/interceptor';
+import { ErrorCode } from '../../../src/core/error';
 
 it('Should user join channel and joined user should receive channel joined event', async () => {
     const [A, B] = await haveUsers(2);
@@ -31,4 +34,18 @@ it('Should user join channel and joined user should receive channel joined event
             res();
         })
     ]);
+});
+
+it('should throw error if channel is not exist', async () => {
+    const [A] = await haveUsers(1);
+    customUsers.push(A);
+    await A.connect();
+    try {
+        await joinChannel(A.client, {
+            channelId: new Types.ObjectId().toString()
+        });
+    } catch (err) {
+        const result = <MetaInterface>err;
+        expect(result.errorCode).toBe(ErrorCode.CHANNEL_NOT_FOUND);
+    }
 });
