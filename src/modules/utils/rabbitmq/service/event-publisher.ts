@@ -12,6 +12,15 @@ export class EventPublisher implements OnModuleInit {
     constructor(private readonly amqpConnection: AmqpConnection, private readonly discoveryService: DiscoveryService) {}
 
     publishToBroadcast<T>(queueName: ChannelBroadcast | string, payload: BroadcastEvent<T>) {
+        logger.info({
+            event: queueName,
+            body: payload,
+            reqId: payload.reqId,
+            user: payload.client,
+            method: 'RABBITMQ',
+            type: 'EMIT',
+            content: 'Rabbitmq - send broadcast event'
+        });
         this.amqpConnection.managedChannels['pubSub']
             .sendToQueue(queueName, Buffer.from(JSON.stringify(payload), 'utf8'))
             .catch((err) => {
@@ -29,6 +38,15 @@ export class EventPublisher implements OnModuleInit {
     }
 
     publishToSocket<T>(queueName: SocketEmitBroadcast | string, payload: SocketEmitEvent<T>) {
+        logger.info({
+            event: queueName,
+            body: payload,
+            reqId: payload.reqId,
+            user: payload.client,
+            method: 'RABBITMQ',
+            type: 'EMIT',
+            content: 'Rabbitmq - send socket event'
+        });
         this.amqpConnection.managedChannels['pubSub']
             .sendToQueue(queueName, Buffer.from(JSON.stringify(payload), 'utf8'))
             .catch((err) => {
@@ -62,7 +80,7 @@ export class EventPublisher implements OnModuleInit {
         });
         const queueNames = [
             ...Object.values(ChannelBroadcast),
-            ...Object.values(SocketEmitBroadcast),
+            ...Object.values(SocketEmitBroadcast).map((value) => NodeIdHelper.getNodeId() + value),
             NodeIdHelper.getNodeId()
         ];
         await Promise.all(
@@ -84,7 +102,6 @@ export class EventPublisher implements OnModuleInit {
                         await boundHandler(body);
                         this.amqpConnection.channels['pubSub'].ack(msg, false);
                     } catch (err) {
-                        console.log({ err });
                         logger.error({
                             method: 'RABBITMQ',
                             meta: { fields, queueName },
