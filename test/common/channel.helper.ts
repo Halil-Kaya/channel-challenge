@@ -10,7 +10,7 @@ import {
     ChannelSearchEmit
 } from '../../src/modules/channel/emit';
 import { getRandomNumber } from './helper';
-import { ChannelEvents } from '../../src/core/enum';
+import { ChannelGatewayEvent } from '../../src/core/enum';
 import { decrypt, encrypt } from './crypto.helper';
 
 export const createChannel = async (client: Socket, dto?: ChannelCreateEmit): Promise<ChannelCreateAck> => {
@@ -22,7 +22,7 @@ export const createChannel = async (client: Socket, dto?: ChannelCreateEmit): Pr
         };
     }
     return new Promise((res, rej) => {
-        client.emit(ChannelEvents.CHANNEL_CREATE, encrypt(dto), (error, response) => {
+        client.emit(ChannelGatewayEvent.CHANNEL_CREATE, encrypt(dto), (error, response) => {
             if (error) {
                 rej(decrypt(error));
             }
@@ -33,7 +33,7 @@ export const createChannel = async (client: Socket, dto?: ChannelCreateEmit): Pr
 
 export const searchChannel = async (client: Socket, dto: ChannelSearchEmit): Promise<ChannelSearchAck[]> => {
     return new Promise((res, rej) => {
-        client.emit(ChannelEvents.CHANNEL_SEARCH, encrypt(dto), (error, response) => {
+        client.emit(ChannelGatewayEvent.CHANNEL_SEARCH, encrypt(dto), (error, response) => {
             if (error) {
                 rej(decrypt(error));
             }
@@ -44,7 +44,7 @@ export const searchChannel = async (client: Socket, dto: ChannelSearchEmit): Pro
 
 export const joinChannel = async (client: Socket, dto: ChannelJoinEmit): Promise<ChannelJoinAck> => {
     return new Promise((res, rej) => {
-        client.emit(ChannelEvents.CHANNEL_JOIN, encrypt(dto), (error, response) => {
+        client.emit(ChannelGatewayEvent.CHANNEL_JOIN, encrypt(dto), (error, response) => {
             if (error) {
                 rej(decrypt(error));
             }
@@ -55,7 +55,7 @@ export const joinChannel = async (client: Socket, dto: ChannelJoinEmit): Promise
 
 export const leaveChannel = async (client: Socket, dto: ChannelLeaveEmit): Promise<ChannelLeaveAck> => {
     return new Promise((res, rej) => {
-        client.emit(ChannelEvents.CHANNEL_LEAVE, encrypt(dto), (error, response) => {
+        client.emit(ChannelGatewayEvent.CHANNEL_LEAVE, encrypt(dto), (error, response) => {
             if (error) {
                 rej(decrypt(error));
             }

@@ -1,7 +1,7 @@
 import { ChannelMongoModel, ChannelUserMongoModel, decrypt, encrypt, haveUsers, sleep } from '../../common';
 import { ChannelCreateAck, ChannelCreateEmit } from '../../../src/modules/channel/emit';
 import { customUsers } from '../../test-setup';
-import { ChannelEvents } from '../../../src/core/enum';
+import { ChannelGatewayEvent } from '../../../src/core/enum';
 import { ChannelUserRole, ChannelUserStatus } from '../../../src/core/interface';
 
 it('Should user create channel', async () => {
@@ -13,7 +13,7 @@ it('Should user create channel', async () => {
         description: 'test'
     };
     await new Promise<void>(async (res, rej) => {
-        A.client.emit(ChannelEvents.CHANNEL_CREATE, encrypt(dto), async (err, response: string) => {
+        A.client.emit(ChannelGatewayEvent.CHANNEL_CREATE, encrypt(dto), async (err, response: string) => {
             expect(err).toBeNull();
             const result: ChannelCreateAck = decrypt(response);
             expect(result._id).toBeDefined();
