@@ -10,6 +10,7 @@ export const cacheTTL = {
     lock: {
         default: 1000,
         nickname: 2 * 1000,
-        channel_join: 1000
+        channel_join: 1000,
+        channel_leave: 1000
     }
 };

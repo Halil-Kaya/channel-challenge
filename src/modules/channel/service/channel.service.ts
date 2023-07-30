@@ -5,6 +5,8 @@ import {
     ChannelCreateEmit,
     ChannelJoinAck,
     ChannelJoinEmit,
+    ChannelLeaveAck,
+    ChannelLeaveEmit,
     ChannelSearchAck,
     ChannelSearchEmit
 } from '../emit';
@@ -109,6 +111,10 @@ export class ChannelService {
                 channel
             }
         });
+        return;
+    }
+
+    async leave({}: SocketEmit<ChannelLeaveEmit>): Promise<ChannelLeaveAck> {
         return;
     }
 }

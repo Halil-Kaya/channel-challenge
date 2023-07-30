@@ -1,12 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { EventHandler } from '../../../core/decorator';
-import { ChannelEvents } from "../../../core/enum";
+import { ChannelEvents } from '../../../core/enum';
 import { SocketEmit } from '../../../core/interface';
 import {
     ChannelCreateAck,
     ChannelCreateEmit,
     ChannelJoinAck,
     ChannelJoinEmit,
+    ChannelLeaveAck,
+    ChannelLeaveEmit,
     ChannelSearchAck,
     ChannelSearchEmit
 } from '../emit';
@@ -29,5 +31,10 @@ export class ChannelGateway {
     @EventHandler(ChannelEvents.CHANNEL_JOIN)
     channelJoin(dto: SocketEmit<ChannelJoinEmit>): Promise<ChannelJoinAck> {
         return this.channelService.join(dto);
+    }
+
+    @EventHandler(ChannelEvents.CHANNEL_LEAVE)
+    channelLeave(dto: SocketEmit<ChannelLeaveEmit>): Promise<ChannelLeaveAck> {
+        return this.channelService.leave(dto);
     }
 }

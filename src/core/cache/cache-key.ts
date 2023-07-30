@@ -13,5 +13,6 @@ export const cacheKeys = {
 
     //locks
     nickname: (nickname: string) => `nickname:${nickname}`,
-    channel_join: (channelId: string, userId) => `channel_join:${channelId}:${userId}`
+    channel_join: (channelId: string, userId) => `channel_join:${channelId}:${userId}`,
+    channel_leave: (channelId: string, userId) => `channel_leave:${channelId}:${userId}`
 };
