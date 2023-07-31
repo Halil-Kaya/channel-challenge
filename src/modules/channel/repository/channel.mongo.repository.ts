@@ -8,7 +8,7 @@ import { Channel } from '../../../core/interface';
 export class ChannelMongoRepository {
     constructor(@InjectModel(ChannelModel.name) private readonly channelModel: Model<ChannelDocument>) {}
 
-    save(channel: Omit<Channel, '_id' | 'createdAt'>, session?: ClientSession) {
+    save(channel: Omit<Channel, '_id' | 'createdAt'>, session?: ClientSession): Promise<Channel> {
         const newChannel = new this.channelModel({
             ...channel
         });

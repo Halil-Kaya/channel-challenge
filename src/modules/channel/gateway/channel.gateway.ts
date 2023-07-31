@@ -12,7 +12,7 @@ import {
     ChannelSearchAck,
     ChannelSearchEmit
 } from '../emit';
-import { ChannelService } from '../service/channel.service';
+import { ChannelService } from '../service';
 
 @Injectable()
 export class ChannelGateway {

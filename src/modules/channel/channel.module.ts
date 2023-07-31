@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { ChannelGateway } from './gateway/channel.gateway';
-import { ChannelService } from './service/channel.service';
 import { ChannelCacheRepository, ChannelMongoRepository, ChannelRepository } from './repository';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ChannelFactory } from './model/channel.model';
@@ -10,6 +9,7 @@ import { LockService } from '../../core/service';
 import { CustomRabbitMqModule } from '../utils/rabbitmq/rabbitmq.module';
 import { UserModule } from '../user/user.module';
 import { ChannelBroadcastHandler } from './broadcast/channel-broadcast.handler';
+import { ChannelInternalService, ChannelService } from './service';
 
 @Module({
     imports: [
@@ -26,8 +26,9 @@ import { ChannelBroadcastHandler } from './broadcast/channel-broadcast.handler';
         ChannelMongoRepository,
         ChannelCacheRepository,
         LockService,
-        ChannelBroadcastHandler
+        ChannelBroadcastHandler,
+        ChannelInternalService
     ],
-    exports: []
+    exports: [ChannelInternalService]
 })
 export class ChannelModule {}
