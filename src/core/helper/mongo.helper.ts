@@ -8,6 +8,10 @@ export function preSave(next: any) {
     next();
 }
 
+export const leanObjectsId = (results) => {
+    results.forEach((result) => leanObjectId(result));
+};
+
 export const leanObjectId = (result) => {
     if (result) {
         result._id = result._id.toString();

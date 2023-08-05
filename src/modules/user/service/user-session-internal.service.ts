@@ -14,6 +14,11 @@ export class UserSessionInternalService {
         return this.userSessionCacheRepository.getSessionUser(userId);
     }
 
+    async getSessionUsers(userIds: string[]): Promise<UserSession[]> {
+        const sessions = await this.userSessionCacheRepository.getSessionUsers(userIds);
+        return sessions.filter((session) => session != null);
+    }
+
     deleteCache(userId: string): Promise<void> {
         return this.userSessionCacheRepository.deleteCache(userId);
     }

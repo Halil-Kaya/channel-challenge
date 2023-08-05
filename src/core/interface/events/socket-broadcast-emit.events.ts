@@ -1,5 +1,6 @@
 import { Client } from '../client.interface';
 import { UserSession } from '../index';
+import { ChannelSendMessageAck } from '../../../modules/channel-message/emit';
 
 export interface SocketEmitEvent<T> {
     client: Client;
@@ -7,6 +8,19 @@ export interface SocketEmitEvent<T> {
     payload: T;
     userSession: UserSession;
     event: string;
+}
+
+export interface SocketFanoutEmitEvent<T> {
+    client: Client;
+    reqId: string;
+    payload: T;
+    userSessions: UserSession[];
+    event: string;
+    channelId: string;
+}
+
+export interface ChannelMessageSocketEmitEvent {
+    channelMessage: ChannelSendMessageAck;
 }
 
 export interface ChannelJoinedSocketEmitEvent {

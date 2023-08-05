@@ -36,4 +36,8 @@ export class ChannelUserRepository {
     isExist(filter: Partial<ChannelUser>) {
         return this.channelUserModel.exists(filter);
     }
+
+    getUsersOfChannel(channelId: string, excludedIds: string[] = []): Promise<ChannelUser[]> {
+        return this.channelUserModel.find({ channelId, $nin: excludedIds }).lean().exec();
+    }
 }

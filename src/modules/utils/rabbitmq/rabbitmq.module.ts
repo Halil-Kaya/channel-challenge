@@ -9,7 +9,12 @@ import { Environment } from '../../../core/interface';
         RabbitMQModule.forRootAsync(RabbitMQModule, {
             imports: [],
             useFactory: async (configService: ConfigService<Environment>) => ({
-                exchanges: [],
+                exchanges: [
+                    {
+                        type: 'direct',
+                        name: 'exchange-direct'
+                    }
+                ],
                 uri: configService.get('RABBITMQ_NODE_CONNECTION_URL'),
                 channels: {
                     pubSub: {

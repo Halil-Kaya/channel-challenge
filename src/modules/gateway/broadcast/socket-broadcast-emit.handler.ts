@@ -3,7 +3,12 @@ import { ServerGateway } from '../gateway/server.gateway';
 import { NodeIdHelper } from '../../../core/helper';
 import { RabbitmqQueueuHandler } from '../../../core/decorator';
 import { SocketEmitBroadcast } from '../../../core/enum';
-import { ChannelJoinedSocketEmitEvent, ChannelLeftSocketEmitEvent, SocketEmitEvent } from '../../../core/interface';
+import {
+    ChannelJoinedSocketEmitEvent,
+    ChannelLeftSocketEmitEvent,
+    SocketEmitEvent,
+    SocketFanoutEmitEvent
+} from '../../../core/interface';
 import { CryptoService } from '../../../core/service';
 
 @Injectable()
@@ -26,5 +31,10 @@ export class SocketBroadcastEmitHandler {
     private async handleIndividual({ payload, userSession, event }: SocketEmitEvent<any>) {
         const socket = this.serverGateway.getSocketById(userSession.socketId);
         socket.emit(event, this.crpytoService.encrypt(payload));
+    }
+
+    @RabbitmqQueueuHandler(NodeIdHelper.getNodeId() + SocketEmitBroadcast.FANOUT)
+    private async handleSocketFanout({ payload, userSessions, event, channelId }: SocketFanoutEmitEvent<any>) {
+        console.log('@RabbitmqQueueuHandler(SocketEmitBroadcast.FANOUT) -> ');
     }
 }

@@ -1,6 +1,11 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { AmqpConnection } from '@golevelup/nestjs-rabbitmq';
-import { ChannelBroadcast, DecoratorMetaKey, SocketEmitBroadcast } from '../../../../core/enum';
+import {
+    ChannelBroadcast,
+    ChannelMessageBroadcast,
+    DecoratorMetaKey,
+    SocketEmitBroadcast
+} from '../../../../core/enum';
 import { NodeIdHelper } from '../../../../core/helper';
 import { DiscoveryService } from '@golevelup/nestjs-discovery';
 import { logger } from '../../../../core/logger/logger';
@@ -66,6 +71,36 @@ export class EventPublisher implements OnModuleInit {
             });
     }
 
+    //TODO bunun tek bir kuyruga degil bir den fazla kuyruga gondermesi gerekiyor
+    publishToSocketFanout<T>(payload: any) {
+        logger.info({
+            event: SocketEmitBroadcast.FANOUT,
+            body: payload,
+            reqId: payload.reqId,
+            user: payload.client,
+            method: 'RABBITMQ',
+            type: 'EMIT',
+            content: 'Rabbitmq - send socket fanout event'
+        });
+        this.amqpConnection.managedChannels['pubSub']
+            .publish('exchange-direct', SocketEmitBroadcast.FANOUT, Buffer.from(JSON.stringify(payload), 'utf8'))
+            .catch((err) => {
+                logger.error({
+                    err,
+                    event: SocketEmitBroadcast.FANOUT,
+                    body: payload,
+                    reqId: payload.reqId,
+                    user: payload.client,
+                    meta: {
+                        userSessions: payload.userSessions
+                    },
+                    method: 'RABBITMQ',
+                    type: 'EMIT',
+                    content: 'Rabbitmq - could not send socket fanout emit event'
+                });
+            });
+    }
+
     async onModuleInit() {
         const methods = await this.discoveryService.providerMethodsWithMetaAtKey(
             DecoratorMetaKey.RABBITMQ_QUEUE_HANDLER
@@ -80,11 +115,26 @@ export class EventPublisher implements OnModuleInit {
         });
         const queueNames = [
             ...Object.values(ChannelBroadcast),
+            ...Object.values(ChannelMessageBroadcast),
             ...Object.values(SocketEmitBroadcast).map((value) => NodeIdHelper.getNodeId() + value),
             NodeIdHelper.getNodeId()
         ];
-        await Promise.all(
-            queueNames.map(async (queueName) => {
+        const fanoutQueueNames = [SocketEmitBroadcast.FANOUT];
+        await this.amqpConnection.managedChannels['pubSub'].assertExchange('exchange-direct', 'direct', {
+            durable: true
+        });
+        await Promise.all([
+            ...fanoutQueueNames.map(async (fanoutQueuName) => {
+                await this.amqpConnection.managedChannels['pubSub'].assertQueue(
+                    NodeIdHelper.getNodeId() + fanoutQueuName
+                );
+                await this.amqpConnection.managedChannels['pubSub'].bindQueue(
+                    NodeIdHelper.getNodeId() + fanoutQueuName,
+                    'exchange-direct',
+                    fanoutQueuName
+                );
+            }),
+            ...queueNames.map(async (queueName) => {
                 await this.amqpConnection.managedChannels['pubSub'].assertQueue(queueName);
                 await this.amqpConnection.managedChannels['pubSub'].consume(queueName, async (msg) => {
                     const fields = msg.fields;
@@ -116,6 +166,6 @@ export class EventPublisher implements OnModuleInit {
                     }
                 });
             })
-        );
+        ]);
     }
 }

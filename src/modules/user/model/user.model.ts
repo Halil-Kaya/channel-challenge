@@ -1,7 +1,7 @@
 import { Document, Schema as MongooseSchema, Types } from 'mongoose';
 import { AsyncModelFactory, Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { CollectionName, User } from '../../../core/interface';
-import { leanObjectId, preSave } from '../../../core/helper';
+import { leanObjectId, leanObjectsId, preSave } from "../../../core/helper";
 
 export type UserDocument = UserModel & Document;
 
@@ -38,7 +38,7 @@ export const UserFactory: AsyncModelFactory = {
     name: UserModel.name,
     useFactory: () => {
         UserSchema.pre('save', preSave);
-        UserSchema.post('find', leanObjectId);
+        UserSchema.post('find', leanObjectsId);
         UserSchema.post('findOne', leanObjectId);
         UserSchema.post('findOneAndUpdate', preSave);
         UserSchema.post('findOneAndUpdate', leanObjectId);

@@ -1,17 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import { ChannelMessageRepository } from '../repository/channel-message.repository';
-import { SocketEmit } from '../../../core/interface';
+import { ChannelSendMessageBroadcastEvent, SocketEmit } from '../../../core/interface';
 import { ChannelSendMessageAck, ChannelSendMessageEmit } from '../emit';
 import { ChannelInternalService } from '../../channel/service';
 import { ChannelNotFoundException, UserNotInChannelException } from '../../../core/error';
 import { ChannelUserInternalService } from '../../channel-user/service/channel-user-internal.service';
+import { EventPublisher } from '../../utils/rabbitmq/service/event-publisher';
+import { ChannelMessageBroadcast } from '../../../core/enum';
 
 @Injectable()
 export class ChannelMessageService {
     constructor(
         private readonly channelMessageRepository: ChannelMessageRepository,
         private readonly channelInternalService: ChannelInternalService,
-        private readonly channelUserService: ChannelUserInternalService
+        private readonly channelUserService: ChannelUserInternalService,
+        private readonly eventPublisher: EventPublisher
     ) {}
 
     async sendMessage({ payload, client, reqId }: SocketEmit<ChannelSendMessageEmit>): Promise<ChannelSendMessageAck> {
@@ -34,7 +37,25 @@ export class ChannelMessageService {
             channelId
         });
 
-        //TODO : message lari kanaldaki kullanicilara gonder
+        const messageAck = {
+            messageId: createdMessage._id,
+            channelId: createdMessage.channelId,
+            message: createdMessage.message,
+            sender: createdMessage.sender,
+            seenCount: createdMessage.seenCount,
+            createdAt: createdMessage.createdAt
+        };
+
+        this.eventPublisher.publishToBroadcast<ChannelSendMessageBroadcastEvent>(
+            ChannelMessageBroadcast.CHANNEL_MESSAGE_SEND,
+            {
+                client,
+                reqId,
+                payload: {
+                    message: messageAck
+                }
+            }
+        );
 
         return {
             messageId: createdMessage._id,

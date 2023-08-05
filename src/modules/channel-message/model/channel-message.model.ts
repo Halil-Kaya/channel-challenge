@@ -1,7 +1,7 @@
 import { Document, Schema as MongooseSchema, Types } from 'mongoose';
 import { AsyncModelFactory, Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ChannelMessage, CollectionName } from '../../../core/interface';
-import { leanObjectId } from '../../../core/helper';
+import { leanObjectId, leanObjectsId } from "../../../core/helper";
 
 export type ChannelMessageDocument = ChannelMessageModel & Document;
 
@@ -40,7 +40,7 @@ export const ChannelMessageFactory: AsyncModelFactory = {
     collection: CollectionName.CHANNEL,
     name: ChannelMessageModel.name,
     useFactory: () => {
-        ChannelMessageSchema.post('find', leanObjectId);
+        ChannelMessageSchema.post('find', leanObjectsId);
         ChannelMessageSchema.post('findOne', leanObjectId);
         ChannelMessageSchema.post('findOneAndUpdate', leanObjectId);
         return ChannelMessageSchema;

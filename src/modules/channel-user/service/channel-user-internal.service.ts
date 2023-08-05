@@ -8,7 +8,7 @@ export class ChannelUserInternalService {
     constructor(private readonly channelUserRepository: ChannelUserRepository) {}
 
     findOneAndUpdate(
-        filter : Partial<ChannelUser>,
+        filter: Partial<ChannelUser>,
         payload: Partial<Omit<ChannelUser, '_id' | 'createdAt'>>,
         session?: ClientSession
     ): Promise<ChannelUser> {
@@ -22,5 +22,9 @@ export class ChannelUserInternalService {
             status: ChannelUserStatus.ACTIVE
         });
         return !!result;
+    }
+
+    async getUsersOfChannel(channelId: string, excludedIds: string[] = []): Promise<ChannelUser[]> {
+        return this.channelUserRepository.getUsersOfChannel(channelId, excludedIds);
     }
 }

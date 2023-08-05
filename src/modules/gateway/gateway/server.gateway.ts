@@ -46,6 +46,12 @@ export class ServerGateway implements OnGatewayInit, OnGatewayConnection, OnGate
         return this.server.sockets.sockets;
     }
 
+    public async getSocketOfChannel(channelId: string) {
+        const socketIdSets = await this.server.in(channelId).fetchSockets();
+        console.log({ socketIdSets });
+        return socketIdSets;
+    }
+
     afterInit(server: Server) {
         server.use(async (socket: Socket, next) => {
             try {

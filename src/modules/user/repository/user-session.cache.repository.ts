@@ -28,6 +28,10 @@ export class UserSessionCacheRepository {
         return this.deserializeUserSession(userSessionCache);
     }
 
+    async getSessionUsers(userIds: string[]): Promise<UserSession[]> {
+        return Promise.all(userIds.map((userId) => this.getSessionUser(userId)));
+    }
+
     private convertUserToSessionUserObjcet(user: Omit<User, 'password'>, socketId: string): UserSession {
         return {
             userId: user._id.toString(),
