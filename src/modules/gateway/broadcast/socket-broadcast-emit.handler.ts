@@ -34,7 +34,19 @@ export class SocketBroadcastEmitHandler {
     }
 
     @RabbitmqQueueuHandler(NodeIdHelper.getNodeId() + SocketEmitBroadcast.FANOUT)
-    private async handleSocketFanout({ payload, userSessions, event, channelId }: SocketFanoutEmitEvent<any>) {
-        console.log('@RabbitmqQueueuHandler(SocketEmitBroadcast.FANOUT) -> ');
+    private async handleSocketFanout({
+        payload,
+        event,
+        channelId,
+        shouldSenderReceive,
+        senderSession
+    }: SocketFanoutEmitEvent<any>) {
+        const senderSocket = this.serverGateway.getSocketById(senderSession.userId);
+        if (senderSocket && !shouldSenderReceive) {
+            senderSocket.broadcast.to(channelId).emit(event, this.crpytoService.encrypt(payload));
+            return;
+        }
+        const server = this.serverGateway.getServer();
+        server.to(channelId).emit(event, this.crpytoService.encrypt(payload));
     }
 }

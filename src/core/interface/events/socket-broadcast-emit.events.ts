@@ -17,6 +17,8 @@ export interface SocketFanoutEmitEvent<T> {
     userSessions: UserSession[];
     event: string;
     channelId: string;
+    shouldSenderReceive: boolean;
+    senderSession: UserSession;
 }
 
 export interface ChannelMessageSocketEmitEvent {

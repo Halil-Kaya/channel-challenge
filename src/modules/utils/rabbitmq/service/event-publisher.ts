@@ -9,7 +9,7 @@ import {
 import { NodeIdHelper } from '../../../../core/helper';
 import { DiscoveryService } from '@golevelup/nestjs-discovery';
 import { logger } from '../../../../core/logger/logger';
-import { BroadcastEvent, SocketEmitEvent } from '../../../../core/interface';
+import { BroadcastEvent, SocketEmitEvent, SocketFanoutEmitEvent } from '../../../../core/interface';
 
 @Injectable()
 export class EventPublisher implements OnModuleInit {
@@ -71,8 +71,7 @@ export class EventPublisher implements OnModuleInit {
             });
     }
 
-    //TODO bunun tek bir kuyruga degil bir den fazla kuyruga gondermesi gerekiyor
-    publishToSocketFanout<T>(payload: any) {
+    publishToSocketFanout<T>(payload: SocketFanoutEmitEvent<T>) {
         logger.info({
             event: SocketEmitBroadcast.FANOUT,
             body: payload,

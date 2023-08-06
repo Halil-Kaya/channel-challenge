@@ -3,6 +3,7 @@ import { customUsers } from '../../test-setup';
 import { createChannel, joinChannel } from '../../common/channel.helper';
 import { channelSendMessage } from '../../common/channel-message.helper';
 import { BackendOriginated } from '../../../src/core/enum/backend-originated.enum';
+import { ChannelMessageSocketEmitEvent } from '../../../src/core/interface';
 
 it('should user send message to channel', async () => {
     const [A, B] = await haveUsers(2);
@@ -41,7 +42,12 @@ it('should not receive message event for user who message sent, other users shou
     const ops = [B, C, D, E].map((user) => {
         return new Promise<void>((res, rej) => {
             user.client.on(BackendOriginated.CHANNEL_MESSAGE, (response) => {
-                const result = <any>decrypt(response);
+                const result = <ChannelMessageSocketEmitEvent>decrypt(response);
+                expect(result.channelMessage.channelId).toBe(channelId);
+                expect(result.channelMessage.message).toBe('Text message');
+                expect(result.channelMessage.sender).toBe(A.user._id);
+                expect(result.channelMessage.seenCount).toBe(0);
+                expect(result.channelMessage.createdAt).toBeDefined();
                 res();
             });
         });
