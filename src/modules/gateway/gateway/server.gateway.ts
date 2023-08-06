@@ -59,6 +59,7 @@ export class ServerGateway implements OnGatewayInit, OnGatewayConnection, OnGate
                 const { token } = <{ token: string }>this.cryptoService.decrypt(socket.handshake?.query?.data + '');
                 socket.data['connectionTime'] = Date.now();
                 socket.data.user = await this.authProvider.auth(token, socket.id);
+                await this.authProvider.joinChannels(socket.data.user._id, socket);
                 logger.info({
                     reqId: socket.id,
                     user: socket.data.user,
@@ -81,6 +82,7 @@ export class ServerGateway implements OnGatewayInit, OnGatewayConnection, OnGate
         await this.registerHandlers(socket);
     }
     async handleDisconnect(socket: Socket) {
+        await this.authProvider.leaveChannels(socket.data.user._id, socket);
         await this.authProvider.disconnect(socket.data.user);
         logger.info({
             reqId: socket.id,

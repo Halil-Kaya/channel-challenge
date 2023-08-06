@@ -27,4 +27,8 @@ export class ChannelUserInternalService {
     async getUsersOfChannel(channelId: string, excludedIds: string[] = []): Promise<ChannelUser[]> {
         return this.channelUserRepository.getUsersOfChannel(channelId, excludedIds);
     }
+
+    async getChannelUserById(userId: string): Promise<ChannelUser[]> {
+        return this.channelUserRepository.getChannelUserById(userId);
+    }
 }

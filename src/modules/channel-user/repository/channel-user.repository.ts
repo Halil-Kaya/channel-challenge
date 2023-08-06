@@ -40,4 +40,13 @@ export class ChannelUserRepository {
     getUsersOfChannel(channelId: string, excludedIds: string[] = []): Promise<ChannelUser[]> {
         return this.channelUserModel.find({ channelId, $nin: excludedIds }).lean().exec();
     }
+
+    getChannelUserById(userId: string): Promise<ChannelUser[]> {
+        return this.channelUserModel
+            .find({
+                userId
+            })
+            .lean()
+            .exec();
+    }
 }

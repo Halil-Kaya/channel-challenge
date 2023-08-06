@@ -14,9 +14,10 @@ import {
 import { UserModule } from '../user/user.module';
 import { SocketBroadcastEmitHandler } from './broadcast/socket-broadcast-emit.handler';
 import { CustomRabbitMqModule } from '../utils/rabbitmq/rabbitmq.module';
+import { ChannelUserModule } from '../channel-user/channel-user.module';
 
 @Module({
-    imports: [DiscoveryModule, UserModule, CustomRabbitMqModule],
+    imports: [DiscoveryModule, UserModule, CustomRabbitMqModule, ChannelUserModule],
     providers: [
         ServerGateway,
         CryptoService,
