@@ -64,3 +64,65 @@ it('should not receive message event for user who message sent, other users shou
         ...ops
     ]);
 });
+
+it('should not receive message event for user who message sent, other users should receive event through disconnect and connect again', async () => {
+    const [A, B, C, D, E] = await haveUsers(5);
+    customUsers.push(A, B, C, D, E);
+    await Promise.all([A.connect(), B.connect(), C.connect(), D.connect(), E.connect()]);
+    const { _id: channelId } = await createChannel(A.client);
+    await Promise.all([
+        joinChannel(B.client, { channelId }),
+        joinChannel(C.client, { channelId }),
+        joinChannel(D.client, { channelId }),
+        joinChannel(E.client, { channelId })
+    ]);
+
+    await sleep(500);
+
+    await Promise.all([A.disconnect(), B.disconnect(), C.disconnect(), D.disconnect(), E.disconnect()]);
+
+    await sleep(100);
+
+    await Promise.all([
+        A.client.connect(),
+        B.client.connect(),
+        C.client.connect(),
+        D.client.connect(),
+        E.client.connect()
+    ]);
+
+    await sleep(100);
+
+    await channelSendMessage(A.client, {
+        channelId,
+        message: 'Text message'
+    });
+
+    const ops = [B, C, D, E].map((user) => {
+        return new Promise<void>((res) => {
+            user.client.on(BackendOriginated.CHANNEL_MESSAGE, (response) => {
+                const result = <ChannelMessageSocketEmitEvent>decrypt(response);
+                expect(result.channelMessage.channelId).toBe(channelId);
+                expect(result.channelMessage.message).toBe('Text message');
+                expect(result.channelMessage.sender).toBe(A.user._id);
+                expect(result.channelMessage.seenCount).toBe(0);
+                expect(result.channelMessage.createdAt).toBeDefined();
+                res();
+            });
+        });
+    });
+
+    await Promise.all([
+        new Promise<void>(async (res, rej) => {
+            A.client.on(BackendOriginated.CHANNEL_MESSAGE, (response) => {
+                const result = <ChannelMessageSocketEmitEvent>decrypt(response);
+
+                console.log('mesaj geldi', result);
+                rej();
+            });
+            await sleep(200);
+            res();
+        }),
+        ...ops
+    ]);
+});

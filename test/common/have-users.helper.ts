@@ -28,10 +28,10 @@ export const haveUsers = async (count: number): Promise<TestUser[]> => {
                 if (client.connected) {
                     return;
                 }
-                client.connect();
+                await client.connect();
             },
             disconnect: async () => {
-                client.disconnect();
+                await client.disconnect();
             },
             clear: () => {
                 client.close();

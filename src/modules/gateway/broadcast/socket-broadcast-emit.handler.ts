@@ -41,7 +41,7 @@ export class SocketBroadcastEmitHandler {
         shouldSenderReceive,
         senderSession
     }: SocketFanoutEmitEvent<any>) {
-        const senderSocket = this.serverGateway.getSocketById(senderSession.userId);
+        const senderSocket = this.serverGateway.getSocketById(senderSession.socketId);
         if (senderSocket && !shouldSenderReceive) {
             senderSocket.broadcast.to(channelId).emit(event, this.crpytoService.encrypt(payload));
             return;

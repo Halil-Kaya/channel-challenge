@@ -27,10 +27,8 @@ export class ChannelMessageBroadcastHandler {
         const sessions = await this.userSessionIntervalService.getSessionUsers(channelUserIds);
         const onlineUserIds = sessions.map((session) => session.userId);
         const offlineUserIds = channelUserIds.filter((channelUserId) => !onlineUserIds.includes(channelUserId));
-        console.log({ offlineUserIds });
         //TODO : offlien olanlar icin mesaji kaydet
         const senderSession = sessions.find((session) => session.userId == client._id);
-
         this.eventPublisher.publishToSocketFanout<ChannelMessageSocketEmitEvent>({
             reqId,
             client,
