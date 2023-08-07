@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { ClientSession, Model } from 'mongoose';
-import { ChannelMessageDocument, ChannelMessageModel } from '../model/channel-message.model';
+import { ChannelMessageDocument, ChannelMessageModel } from '../model';
 import { ChannelMessage } from '../../../core/interface';
 
 @Injectable()
