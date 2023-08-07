@@ -1,9 +1,10 @@
 import mongoose, { Model } from 'mongoose';
 import { testConfig } from '../../test-config';
 import { UserModel, UserSchema } from '../../../src/modules/user/model/user.model';
-import { ChannelUser, CollectionName } from '../../../src/core/interface';
-import { ChannelUserSchema } from '../../../src/modules/channel-user/model/channel-user.model';
+import { CollectionName } from '../../../src/core/interface';
+import { ChannelUserModel, ChannelUserSchema } from '../../../src/modules/channel-user/model/channel-user.model';
 import { ChannelModel, ChannelSchema } from '../../../src/modules/channel/model/channel.model';
+import { UnseenChannelMessageModel, UnseenChannelMessageSchema } from '../../../src/modules/channel-message/model';
 
 export const mongoDb = mongoose.connection;
 
@@ -24,8 +25,13 @@ export const closeMongoDb = async (): Promise<void> => {
     await mongoDb.close();
 };
 
-export const UserMongoModel = <Model<UserModel>>mongoDb.model('user', UserSchema, 'user');
-export const ChannelMongoModel = <Model<ChannelModel>>mongoDb.model('channel', ChannelSchema, 'channel');
-export const ChannelUserMongoModel = <Model<ChannelUser>>(
-    mongoDb.model('channel_user', ChannelUserSchema, 'channel_user')
+export const UserMongoModel = <Model<UserModel>>mongoDb.model(UserModel.name, UserSchema, CollectionName.USER);
+export const ChannelMongoModel = <Model<ChannelModel>>(
+    mongoDb.model(ChannelModel.name, ChannelSchema, CollectionName.CHANNEL)
+);
+export const ChannelUserMongoModel = <Model<ChannelUserModel>>(
+    mongoDb.model(ChannelUserModel.name, ChannelUserSchema, CollectionName.CHANNEL_USER)
+);
+export const UnseenChannelMessageMongoModel = <Model<UnseenChannelMessageModel>>(
+    mongoDb.model(UnseenChannelMessageModel.name, UnseenChannelMessageSchema, CollectionName.UNSEEN_CHANNEL_MESSAGE)
 );

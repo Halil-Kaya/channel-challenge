@@ -38,7 +38,7 @@ export class ChannelService {
         @InjectConnection() private readonly mongoConnection: Connection
     ) {}
 
-    async save({ payload, client }: SocketEmit<ChannelCreateEmit>): Promise<ChannelCreateAck> {
+    async save({ payload, client, reqId }: SocketEmit<ChannelCreateEmit>): Promise<ChannelCreateAck> {
         const session = await this.mongoConnection.startSession();
         let channel;
         await session.withTransaction(
@@ -60,6 +60,13 @@ export class ChannelService {
             id: channel._id,
             name: channel.name,
             description: channel.description
+        });
+        this.eventPublisher.publishToBroadcast<ChannelJoinedBroadcastEvent>(ChannelBroadcast.CHANNEL_JOINED, {
+            client,
+            reqId,
+            payload: {
+                channel
+            }
         });
         return {
             _id: channel._id,

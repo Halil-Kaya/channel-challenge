@@ -1,4 +1,4 @@
-import { decrypt, haveUsers, sleep } from '../../common';
+import { decrypt, haveUsers, sleep, UnseenChannelMessageMongoModel } from '../../common';
 import { customUsers } from '../../test-setup';
 import { createChannel, joinChannel } from '../../common/channel.helper';
 import { channelSendMessage } from '../../common/channel-message.helper';
@@ -40,7 +40,7 @@ it('should not receive message event for user who message sent, other users shou
     });
 
     const ops = [B, C, D, E].map((user) => {
-        return new Promise<void>((res, rej) => {
+        return new Promise<void>((res) => {
             user.client.on(BackendOriginated.CHANNEL_MESSAGE, (response) => {
                 const result = <ChannelMessageSocketEmitEvent>decrypt(response);
                 expect(result.channelMessage.channelId).toBe(channelId);
@@ -55,7 +55,7 @@ it('should not receive message event for user who message sent, other users shou
 
     await Promise.all([
         new Promise<void>(async (res, rej) => {
-            A.client.on(BackendOriginated.CHANNEL_MESSAGE, (response) => {
+            A.client.on(BackendOriginated.CHANNEL_MESSAGE, () => {
                 rej();
             });
             await sleep(200);
@@ -125,4 +125,70 @@ it('should not receive message event for user who message sent, other users shou
         }),
         ...ops
     ]);
+});
+
+it('Should save messages for offline users', async () => {
+    const [A, B, C, D, E] = await haveUsers(5);
+    customUsers.push(A, B, C, D, E);
+    await Promise.all([A.connect(), B.connect(), C.connect(), D.connect(), E.connect()]);
+    const { _id: channelId } = await createChannel(A.client);
+    await Promise.all([
+        joinChannel(B.client, { channelId }),
+        joinChannel(C.client, { channelId }),
+        joinChannel(D.client, { channelId }),
+        joinChannel(E.client, { channelId })
+    ]);
+    await sleep(100);
+    await Promise.all([D.disconnect(), E.disconnect()]);
+
+    const opsForOfflines = [B, D, E].map((user) => {
+        return new Promise<void>(async (res, rej) => {
+            user.client.on(BackendOriginated.CHANNEL_MESSAGE, () => {
+                rej();
+            });
+            await sleep(100);
+            res();
+        });
+    });
+
+    const offlineUserIds = [D, E].map((user) => user.user._id);
+
+    const opsForOnlines = [A, C].map((user) => {
+        return new Promise<void>((res) => {
+            user.client.on(BackendOriginated.CHANNEL_MESSAGE, (response) => {
+                const result = <ChannelMessageSocketEmitEvent>decrypt(response);
+                expect(result.channelMessage.channelId).toBe(channelId);
+                expect(result.channelMessage.message).toBe('HEY');
+                expect(result.channelMessage.sender).toBe(B.user._id);
+                expect(result.channelMessage.seenCount).toBe(0);
+                expect(result.channelMessage.createdAt).toBeDefined();
+                res();
+            });
+        });
+    });
+
+    const [message] = await Promise.all([
+        channelSendMessage(B.client, {
+            channelId,
+            message: 'HEY'
+        }),
+        ...opsForOfflines,
+        ...opsForOnlines
+    ]);
+
+    const result = await Promise.all(
+        offlineUserIds.map((offlineUserId) => {
+            return UnseenChannelMessageMongoModel.exists({
+                userId: offlineUserId,
+                messageId: message.messageId
+            })
+                .lean()
+                .exec();
+        })
+    );
+    expect(result.every((r) => !!r)).toBeTruthy();
+    const count = await UnseenChannelMessageMongoModel.count({
+        messageId: message.messageId
+    });
+    expect(count).toBe(2);
 });

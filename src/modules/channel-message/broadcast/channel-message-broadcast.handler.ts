@@ -10,13 +10,15 @@ import {
 } from '../../../core/interface';
 import { ChannelUserInternalService } from '../../channel-user/service/channel-user-internal.service';
 import { BackendOriginated } from '../../../core/enum/backend-originated.enum';
+import { UnseenChannelMessageService } from '../service';
 
 @Injectable()
 export class ChannelMessageBroadcastHandler {
     constructor(
         private readonly eventPublisher: EventPublisher,
         private readonly userSessionIntervalService: UserSessionInternalService,
-        private readonly channelUserInternalService: ChannelUserInternalService
+        private readonly channelUserInternalService: ChannelUserInternalService,
+        private readonly unseenChannelMessageService: UnseenChannelMessageService
     ) {}
 
     @RabbitmqQueueuHandler(ChannelMessageBroadcast.CHANNEL_MESSAGE_SEND)
@@ -27,7 +29,15 @@ export class ChannelMessageBroadcastHandler {
         const sessions = await this.userSessionIntervalService.getSessionUsers(channelUserIds);
         const onlineUserIds = sessions.map((session) => session.userId);
         const offlineUserIds = channelUserIds.filter((channelUserId) => !onlineUserIds.includes(channelUserId));
-        //TODO : offlien olanlar icin mesaji kaydet
+
+        await this.unseenChannelMessageService.bulkWrite(
+            offlineUserIds.map((offlineUserId) => {
+                return {
+                    messageId: message.messageId,
+                    userId: offlineUserId
+                };
+            })
+        );
 
         const senderSession = sessions.find((session) => session.userId == client._id);
         this.eventPublisher.publishToSocketFanout<ChannelMessageSocketEmitEvent>({
