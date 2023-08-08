@@ -25,6 +25,10 @@ export interface ChannelMessageSocketEmitEvent {
     channelMessage: ChannelSendMessageAck;
 }
 
+export interface UnseenChannelMessagesSocketEmitEvent {
+    unseenChannelMessages: ChannelSendMessageAck[];
+}
+
 export interface ChannelJoinedSocketEmitEvent {
     channelId: string;
     name: string;

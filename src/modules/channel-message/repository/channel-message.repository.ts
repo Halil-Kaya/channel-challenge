@@ -19,4 +19,12 @@ export class ChannelMessageRepository {
         });
         return newChannelMessage.save({ session });
     }
+
+    findByIds(messageIds: string[], session?: ClientSession) {
+        return this.channelMessageModel
+            .find({ _id: { $in: messageIds } }, {}, { session })
+            .sort({ _id: -1 })
+            .lean()
+            .exec();
+    }
 }

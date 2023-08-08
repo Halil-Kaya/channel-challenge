@@ -6,11 +6,14 @@ import { ChannelMessageBroadcast } from '../../../core/enum';
 import {
     BroadcastEvent,
     ChannelMessageSocketEmitEvent,
-    ChannelSendMessageBroadcastEvent
+    ChannelSendMessageBroadcastEvent,
+    UnseenChannelMessageBroadcastEvent,
+    UnseenChannelMessagesSocketEmitEvent
 } from '../../../core/interface';
 import { ChannelUserInternalService } from '../../channel-user/service/channel-user-internal.service';
 import { BackendOriginated } from '../../../core/enum/backend-originated.enum';
-import { UnseenChannelMessageService } from '../service';
+import { UnseenChannelMessageInternalService } from '../service';
+import { ChannelMessageInternalService } from '../service/channel-message-internal.service';
 
 @Injectable()
 export class ChannelMessageBroadcastHandler {
@@ -18,7 +21,8 @@ export class ChannelMessageBroadcastHandler {
         private readonly eventPublisher: EventPublisher,
         private readonly userSessionIntervalService: UserSessionInternalService,
         private readonly channelUserInternalService: ChannelUserInternalService,
-        private readonly unseenChannelMessageService: UnseenChannelMessageService
+        private readonly unseenChannelMessageService: UnseenChannelMessageInternalService,
+        private readonly channelMessageInternalServcie: ChannelMessageInternalService
     ) {}
 
     @RabbitmqQueueuHandler(ChannelMessageBroadcast.CHANNEL_MESSAGE_SEND)
@@ -51,6 +55,36 @@ export class ChannelMessageBroadcastHandler {
             },
             shouldSenderReceive: false,
             senderSession
+        });
+    }
+
+    @RabbitmqQueueuHandler(ChannelMessageBroadcast.UNSEEN_CHANNEL_MESSAGE)
+    async handleUnseenChannelMessage({ payload, client, reqId }: BroadcastEvent<UnseenChannelMessageBroadcastEvent>) {
+        const { userId } = payload;
+        const userSession = await this.userSessionIntervalService.getSessionUser(userId);
+        const unseenMessagesOfUser = await this.unseenChannelMessageService.getUnseenMessagesByUserId(userId);
+
+        const messages = await this.channelMessageInternalServcie.getMessagesByIds(
+            unseenMessagesOfUser.map((unseenMessage) => unseenMessage.messageId)
+        );
+
+        this.eventPublisher.publishToSocket<UnseenChannelMessagesSocketEmitEvent>(userSession.nodeId, {
+            reqId,
+            userSession,
+            client,
+            payload: {
+                unseenChannelMessages: messages.map((message) => {
+                    return {
+                        message: message.message,
+                        sender: message.sender,
+                        channelId: message.channelId,
+                        messageId: message._id,
+                        createdAt: message.createdAt,
+                        seenCount: message.seenCount
+                    };
+                })
+            },
+            event: BackendOriginated.UNSEEN_CHANNEL_MESSAGES
         });
     }
 }

@@ -3,7 +3,7 @@ import { customUsers } from '../../test-setup';
 import { createChannel, joinChannel } from '../../common/channel.helper';
 import { channelSendMessage } from '../../common/channel-message.helper';
 import { BackendOriginated } from '../../../src/core/enum/backend-originated.enum';
-import { ChannelMessageSocketEmitEvent } from '../../../src/core/interface';
+import { ChannelMessageSocketEmitEvent, UnseenChannelMessagesSocketEmitEvent } from '../../../src/core/interface';
 
 it('should user send message to channel', async () => {
     const [A, B] = await haveUsers(2);
@@ -41,7 +41,7 @@ it('should not receive message event for user who message sent, other users shou
 
     const ops = [B, C, D, E].map((user) => {
         return new Promise<void>((res) => {
-            user.client.on(BackendOriginated.CHANNEL_MESSAGE, (response) => {
+            user.client.once(BackendOriginated.CHANNEL_MESSAGE, (response) => {
                 const result = <ChannelMessageSocketEmitEvent>decrypt(response);
                 expect(result.channelMessage.channelId).toBe(channelId);
                 expect(result.channelMessage.message).toBe('Text message');
@@ -55,7 +55,7 @@ it('should not receive message event for user who message sent, other users shou
 
     await Promise.all([
         new Promise<void>(async (res, rej) => {
-            A.client.on(BackendOriginated.CHANNEL_MESSAGE, () => {
+            A.client.once(BackendOriginated.CHANNEL_MESSAGE, () => {
                 rej();
             });
             await sleep(200);
@@ -100,7 +100,7 @@ it('should not receive message event for user who message sent, other users shou
 
     const ops = [B, C, D, E].map((user) => {
         return new Promise<void>((res) => {
-            user.client.on(BackendOriginated.CHANNEL_MESSAGE, (response) => {
+            user.client.once(BackendOriginated.CHANNEL_MESSAGE, (response) => {
                 const result = <ChannelMessageSocketEmitEvent>decrypt(response);
                 expect(result.channelMessage.channelId).toBe(channelId);
                 expect(result.channelMessage.message).toBe('Text message');
@@ -114,10 +114,7 @@ it('should not receive message event for user who message sent, other users shou
 
     await Promise.all([
         new Promise<void>(async (res, rej) => {
-            A.client.on(BackendOriginated.CHANNEL_MESSAGE, (response) => {
-                const result = <ChannelMessageSocketEmitEvent>decrypt(response);
-
-                console.log('mesaj geldi', result);
+            A.client.once(BackendOriginated.CHANNEL_MESSAGE, () => {
                 rej();
             });
             await sleep(200);
@@ -155,7 +152,7 @@ it('Should save messages for offline users', async () => {
 
     const opsForOnlines = [A, C].map((user) => {
         return new Promise<void>((res) => {
-            user.client.on(BackendOriginated.CHANNEL_MESSAGE, (response) => {
+            user.client.once(BackendOriginated.CHANNEL_MESSAGE, (response) => {
                 const result = <ChannelMessageSocketEmitEvent>decrypt(response);
                 expect(result.channelMessage.channelId).toBe(channelId);
                 expect(result.channelMessage.message).toBe('HEY');
@@ -191,4 +188,45 @@ it('Should save messages for offline users', async () => {
         messageId: message.messageId
     });
     expect(count).toBe(2);
+});
+
+it('should offline users receive messages after be online', async () => {
+    const [A, B, C] = await haveUsers(5);
+    customUsers.push(A, B, C);
+    await Promise.all([A.connect(), B.connect(), C.connect()]);
+    const { _id: channelId } = await createChannel(A.client);
+    await Promise.all([joinChannel(B.client, { channelId }), joinChannel(C.client, { channelId })]);
+    await sleep(50);
+    await Promise.all([B.disconnect(), C.disconnect()]);
+    await sleep(50);
+    for (let i = 0; i < 5; i++) {
+        await channelSendMessage(A.client, {
+            channelId,
+            message: `Message#${i}`
+        });
+    }
+    await sleep(50);
+
+    await Promise.all([
+        B.connect(),
+        C.connect(),
+        ...[B, C].map((testUser) => {
+            return new Promise<void>((res) => {
+                testUser.client.on(BackendOriginated.UNSEEN_CHANNEL_MESSAGES, (response) => {
+                    const result = <UnseenChannelMessagesSocketEmitEvent>decrypt(response);
+                    let messageSortNumber = 0;
+                    expect(result.unseenChannelMessages.length).toBe(5);
+                    for (const channelMessage of result.unseenChannelMessages) {
+                        expect(channelMessage.channelId).toBe(channelId);
+                        expect(channelMessage.message.includes(`Message#${4 - messageSortNumber}`)).toBeTruthy();
+                        expect(channelMessage.sender).toBe(A.user._id);
+                        expect(channelMessage.seenCount).toBe(0);
+                        expect(channelMessage.createdAt).toBeDefined();
+                        messageSortNumber++;
+                    }
+                    res();
+                });
+            });
+        })
+    ]);
 });

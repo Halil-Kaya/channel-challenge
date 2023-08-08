@@ -8,7 +8,8 @@ import { CustomRabbitMqModule } from '../utils/rabbitmq/rabbitmq.module';
 import { UserModule } from '../user/user.module';
 import { ChannelMessageFactory, UnseenChannelMessageFactory } from './model';
 import { ChannelMessageRepository, UnseenChannelMessageRepository } from './repository';
-import { ChannelMessageService, UnseenChannelMessageService } from './service';
+import { ChannelMessageService, UnseenChannelMessageInternalService } from './service';
+import { ChannelMessageInternalService } from './service/channel-message-internal.service';
 
 @Module({
     imports: [
@@ -23,8 +24,9 @@ import { ChannelMessageService, UnseenChannelMessageService } from './service';
         ChannelMessageRepository,
         ChannelMessageService,
         UnseenChannelMessageRepository,
-        UnseenChannelMessageService,
-        ChannelMessageBroadcastHandler
+        UnseenChannelMessageInternalService,
+        ChannelMessageBroadcastHandler,
+        ChannelMessageInternalService
     ]
 })
 export class ChannelMessageModule {}

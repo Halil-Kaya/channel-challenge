@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { ChannelMessageRepository } from '../repository/channel-message.repository';
+import { ChannelMessageRepository } from '../repository';
 import { ChannelSendMessageBroadcastEvent, SocketEmit } from '../../../core/interface';
 import { ChannelSendMessageAck, ChannelSendMessageEmit } from '../emit';
 import { ChannelInternalService } from '../../channel/service';

@@ -11,8 +11,9 @@ import { logger } from '../../../core/logger/logger';
 import { AuthProvider } from '../provider/auth.provider';
 import { SocketMiddleware } from '../middleware';
 import { DiscoveryService } from '@golevelup/nestjs-discovery';
-import { SocketEmit } from '../../../core/interface';
-import { DecoratorMetaKey } from '../../../core/enum';
+import { SocketEmit, UnseenChannelMessageBroadcastEvent, User } from '../../../core/interface';
+import { ChannelMessageBroadcast, DecoratorMetaKey } from '../../../core/enum';
+import { EventPublisher } from '../../utils/rabbitmq/service/event-publisher';
 
 @WebSocketGateway({
     transports: ['websocket'],
@@ -28,7 +29,8 @@ export class ServerGateway implements OnGatewayInit, OnGatewayConnection, OnGate
         private readonly authProvider: AuthProvider,
         private readonly cryptoService: CryptoService,
         private readonly socketMiddleware: SocketMiddleware,
-        private readonly discoveryService: DiscoveryService
+        private readonly discoveryService: DiscoveryService,
+        private readonly eventPublisher: EventPublisher
     ) {}
 
     public getServer() {
@@ -47,9 +49,26 @@ export class ServerGateway implements OnGatewayInit, OnGatewayConnection, OnGate
     }
 
     public async getSocketOfChannel(channelId: string) {
-        const socketIdSets = await this.server.in(channelId).fetchSockets();
-        console.log({ socketIdSets });
-        return socketIdSets;
+        return this.server.in(channelId).fetchSockets();
+    }
+
+    private receiveUnseenMessages(socket: Socket, reqId: string) {
+        const user = <User>socket.data.user;
+
+        this.eventPublisher.publishToBroadcast<UnseenChannelMessageBroadcastEvent>(
+            ChannelMessageBroadcast.UNSEEN_CHANNEL_MESSAGE,
+            {
+                client: {
+                    _id: user._id,
+                    fullName: user.fullName,
+                    isOnline: true,
+                    nickname: user.nickname,
+                    createdAt: user.createdAt
+                },
+                reqId,
+                payload: { userId: user._id }
+            }
+        );
     }
 
     afterInit(server: Server) {
@@ -60,6 +79,7 @@ export class ServerGateway implements OnGatewayInit, OnGatewayConnection, OnGate
                 socket.data['connectionTime'] = Date.now();
                 socket.data.user = await this.authProvider.auth(token, socket.id);
                 await this.authProvider.joinChannels(socket.data.user._id, socket);
+                this.receiveUnseenMessages(socket, socket.id);
                 logger.info({
                     reqId: socket.id,
                     user: socket.data.user,

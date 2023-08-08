@@ -23,4 +23,17 @@ export class UnseenChannelMessageRepository {
             { ordered: false, session }
         );
     }
+
+    getUnseenMessagesByUserId(userId: string, session?: ClientSession): Promise<UnseenChannelMessage[]> {
+        return this.unseenChannelMessageModel
+            .find(
+                {
+                    userId
+                },
+                {},
+                { session }
+            )
+            .lean()
+            .exec();
+    }
 }
