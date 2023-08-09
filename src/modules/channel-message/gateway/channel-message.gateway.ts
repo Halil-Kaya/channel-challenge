@@ -19,5 +19,4 @@ export class ChannelMessageGateway {
     channelMessageRead(dto: SocketEmit<ChannelMessagesReadEmit>): Promise<ChannelMessagesReadAck> {
         return this.channelMessageService.readMessages(dto);
     }
-
 }

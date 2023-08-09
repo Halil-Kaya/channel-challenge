@@ -34,7 +34,7 @@ ChannelMessageReadSchema.index(
 );
 
 export const ChannelMessageReadFactory: AsyncModelFactory = {
-    collection: CollectionName.CHANNEL_MESSAGE,
+    collection: CollectionName.CHANNEL_MESSAGE_READ,
     name: ChannelMessageReadModel.name,
     useFactory: () => {
         ChannelMessageReadSchema.post('find', leanObjectsId);

@@ -36,4 +36,14 @@ export class UnseenChannelMessageRepository {
             .lean()
             .exec();
     }
+
+    deleteMany(userId: string, messageIds: string[], session?: ClientSession) {
+        return this.unseenChannelMessageModel.deleteMany(
+            {
+                userId,
+                messageId: { $in: messageIds }
+            },
+            { session }
+        );
+    }
 }

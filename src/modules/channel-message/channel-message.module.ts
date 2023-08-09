@@ -10,7 +10,7 @@ import { ChannelMessageFactory, ChannelMessageReadFactory, UnseenChannelMessageF
 import { ChannelMessageReadRepository, ChannelMessageRepository, UnseenChannelMessageRepository } from './repository';
 import { ChannelMessageService, UnseenChannelMessageInternalService } from './service';
 import { ChannelMessageInternalService } from './service/channel-message-internal.service';
-import { ChannelMessageReadService } from './service/channel-message-read.service';
+import { LockService } from '../../core/service';
 
 @Module({
     imports: [
@@ -28,8 +28,8 @@ import { ChannelMessageReadService } from './service/channel-message-read.servic
         UnseenChannelMessageInternalService,
         ChannelMessageBroadcastHandler,
         ChannelMessageInternalService,
-        ChannelMessageReadService,
-        ChannelMessageReadRepository
+        ChannelMessageReadRepository,
+        LockService
     ]
 })
 export class ChannelMessageModule {}

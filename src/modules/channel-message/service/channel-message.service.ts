@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { ChannelMessageRepository } from '../repository';
+import { ChannelMessageReadRepository, ChannelMessageRepository, UnseenChannelMessageRepository } from '../repository';
 import { ChannelSendMessageBroadcastEvent, SocketEmit } from '../../../core/interface';
 import {
     ChannelMessagesReadAck,
@@ -8,10 +8,14 @@ import {
     ChannelSendMessageEmit
 } from '../emit';
 import { ChannelInternalService } from '../../channel/service';
-import { ChannelNotFoundException, UserNotInChannelException } from '../../../core/error';
+import { ChannelNotFoundException, RaceConditionException, UserNotInChannelException } from '../../../core/error';
 import { ChannelUserInternalService } from '../../channel-user/service/channel-user-internal.service';
 import { EventPublisher } from '../../utils/rabbitmq/service/event-publisher';
 import { ChannelMessageBroadcast } from '../../../core/enum';
+import { InjectConnection } from '@nestjs/mongoose';
+import { Connection } from 'mongoose';
+import { cacheKeys, cacheTTL } from '../../../core/cache';
+import { LockService } from '../../../core/service';
 
 @Injectable()
 export class ChannelMessageService {
@@ -19,7 +23,11 @@ export class ChannelMessageService {
         private readonly channelMessageRepository: ChannelMessageRepository,
         private readonly channelInternalService: ChannelInternalService,
         private readonly channelUserService: ChannelUserInternalService,
-        private readonly eventPublisher: EventPublisher
+        private readonly channelMessageReadRepository: ChannelMessageReadRepository,
+        private readonly unseenChannelMessageRepository: UnseenChannelMessageRepository,
+        private readonly eventPublisher: EventPublisher,
+        @InjectConnection() private readonly mongoConnection: Connection,
+        private readonly lockService: LockService
     ) {}
 
     async sendMessage({ payload, client, reqId }: SocketEmit<ChannelSendMessageEmit>): Promise<ChannelSendMessageAck> {
@@ -72,8 +80,38 @@ export class ChannelMessageService {
         };
     }
 
-    async readMessages({ payload }: SocketEmit<ChannelMessagesReadEmit>): Promise<ChannelMessagesReadAck> {
+    async readMessages({ payload, client }: SocketEmit<ChannelMessagesReadEmit>): Promise<ChannelMessagesReadAck> {
         const { messageIds } = payload;
+        let lock;
+        try {
+            lock = await this.lockService.lock(cacheKeys.channel_message_read(client._id), {
+                ttl: cacheTTL.lock.channel_message_read,
+                noRetry: true
+            });
+        } catch (err) {
+            throw new RaceConditionException(`RaceCond: ${cacheKeys.channel_message_read(client._id)}`);
+        }
+
+        const session = await this.mongoConnection.startSession();
+        await session.startTransaction();
+        try {
+            await this.channelMessageReadRepository.bulkWrite(
+                messageIds.map((messageId) => {
+                    return {
+                        messageId,
+                        userId: client._id
+                    };
+                }),
+                session
+            );
+            await this.unseenChannelMessageRepository.deleteMany(client._id, messageIds, session);
+        } catch (err) {
+            await session.abortTransaction();
+            throw err;
+        } finally {
+            await session.endSession();
+            await lock.release();
+        }
         return;
     }
 }
