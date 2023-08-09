@@ -2,8 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { EventHandler } from '../../../core/decorator';
 import { ChannelMessageGatewayEvent } from '../../../core/enum';
 import { SocketEmit } from '../../../core/interface';
-import { ChannelSendMessageAck, ChannelSendMessageEmit } from '../emit';
-import { ChannelMessageService } from '../service/channel-message.service';
+import { ChannelMessagesReadEmit, ChannelSendMessageAck, ChannelSendMessageEmit } from '../emit';
+import { ChannelMessageService } from '../service';
+import { ChannelMessagesReadAck } from '../emit';
 
 @Injectable()
 export class ChannelMessageGateway {
@@ -13,4 +14,10 @@ export class ChannelMessageGateway {
     channelMessageSend(dto: SocketEmit<ChannelSendMessageEmit>): Promise<ChannelSendMessageAck> {
         return this.channelMessageService.sendMessage(dto);
     }
+
+    @EventHandler(ChannelMessageGatewayEvent.CHANNEL_MESSAGES_READ)
+    channelMessageRead(dto: SocketEmit<ChannelMessagesReadEmit>): Promise<ChannelMessagesReadAck> {
+        return this.channelMessageService.readMessages(dto);
+    }
+
 }

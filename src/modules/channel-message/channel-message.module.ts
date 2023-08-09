@@ -6,14 +6,15 @@ import { ChannelUserModule } from '../channel-user/channel-user.module';
 import { ChannelMessageBroadcastHandler } from './broadcast/channel-message-broadcast.handler';
 import { CustomRabbitMqModule } from '../utils/rabbitmq/rabbitmq.module';
 import { UserModule } from '../user/user.module';
-import { ChannelMessageFactory, UnseenChannelMessageFactory } from './model';
-import { ChannelMessageRepository, UnseenChannelMessageRepository } from './repository';
+import { ChannelMessageFactory, ChannelMessageReadFactory, UnseenChannelMessageFactory } from './model';
+import { ChannelMessageReadRepository, ChannelMessageRepository, UnseenChannelMessageRepository } from './repository';
 import { ChannelMessageService, UnseenChannelMessageInternalService } from './service';
 import { ChannelMessageInternalService } from './service/channel-message-internal.service';
+import { ChannelMessageReadService } from './service/channel-message-read.service';
 
 @Module({
     imports: [
-        MongooseModule.forFeatureAsync([ChannelMessageFactory, UnseenChannelMessageFactory]),
+        MongooseModule.forFeatureAsync([ChannelMessageFactory, UnseenChannelMessageFactory, ChannelMessageReadFactory]),
         CustomRabbitMqModule,
         UserModule,
         ChannelModule,
@@ -26,7 +27,9 @@ import { ChannelMessageInternalService } from './service/channel-message-interna
         UnseenChannelMessageRepository,
         UnseenChannelMessageInternalService,
         ChannelMessageBroadcastHandler,
-        ChannelMessageInternalService
+        ChannelMessageInternalService,
+        ChannelMessageReadService,
+        ChannelMessageReadRepository
     ]
 })
 export class ChannelMessageModule {}

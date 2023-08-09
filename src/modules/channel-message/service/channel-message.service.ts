@@ -1,7 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { ChannelMessageRepository } from '../repository';
 import { ChannelSendMessageBroadcastEvent, SocketEmit } from '../../../core/interface';
-import { ChannelSendMessageAck, ChannelSendMessageEmit } from '../emit';
+import {
+    ChannelMessagesReadAck,
+    ChannelMessagesReadEmit,
+    ChannelSendMessageAck,
+    ChannelSendMessageEmit
+} from '../emit';
 import { ChannelInternalService } from '../../channel/service';
 import { ChannelNotFoundException, UserNotInChannelException } from '../../../core/error';
 import { ChannelUserInternalService } from '../../channel-user/service/channel-user-internal.service';
@@ -65,5 +70,10 @@ export class ChannelMessageService {
             seenCount: createdMessage.seenCount,
             createdAt: createdMessage.createdAt
         };
+    }
+
+    async readMessages({ payload }: SocketEmit<ChannelMessagesReadEmit>): Promise<ChannelMessagesReadAck> {
+        const { messageIds } = payload;
+        return;
     }
 }
