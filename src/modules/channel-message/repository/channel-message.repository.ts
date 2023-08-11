@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { ClientSession, Model } from 'mongoose';
+import { ClientSession, FilterQuery, Model } from 'mongoose';
 import { ChannelMessageDocument, ChannelMessageModel } from '../model';
 import { ChannelMessage } from '../../../core/interface';
 
@@ -26,5 +26,25 @@ export class ChannelMessageRepository {
             .sort({ _id: -1 })
             .lean()
             .exec();
+    }
+
+    find(filter: FilterQuery<ChannelMessage>): Promise<ChannelMessage[]> {
+        return this.channelMessageModel.find(filter).lean().exec();
+    }
+
+    updateSeenCount(messageId: string, newSeenCount: number, session?: ClientSession) {
+        return this.channelMessageModel.updateOne(
+            {
+                _id: messageId
+            },
+            {
+                $set: {
+                    seenCount: newSeenCount
+                }
+            },
+            {
+                session
+            }
+        );
     }
 }

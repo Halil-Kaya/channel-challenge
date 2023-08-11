@@ -14,6 +14,7 @@ import { DiscoveryService } from '@golevelup/nestjs-discovery';
 import { SocketEmit, UnseenChannelMessageBroadcastEvent, User } from '../../../core/interface';
 import { ChannelMessageBroadcast, DecoratorMetaKey } from '../../../core/enum';
 import { EventPublisher } from '../../utils/rabbitmq/service/event-publisher';
+import { GeneralServerException } from '../../../core/error';
 
 @WebSocketGateway({
     transports: ['websocket'],
@@ -140,6 +141,20 @@ export class ServerGateway implements OnGatewayInit, OnGatewayConnection, OnGate
                     });
                     callBack(null, this.cryptoService.encrypt(response || {}));
                 } catch (err) {
+                    if (!err.isCustomError) {
+                        logger.error({
+                            event,
+                            user: client,
+                            type: 'ACK',
+                            err,
+                            method: 'SOCKET',
+                            respTime: Date.now() - startTime,
+                            reqId
+                        });
+                        err = new GeneralServerException();
+                        callBack(this.cryptoService.encrypt(err));
+                        return;
+                    }
                     logger.warn({
                         event,
                         user: client,

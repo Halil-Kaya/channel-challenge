@@ -3,8 +3,8 @@ echo "sleeping for 10 seconds"
 sleep 10
 
 echo mongo_setup.sh time now: `date +"%T" `
-mongosh --host localhost:27017 <<EOF
-  var cfg = {
+mongosh --host mongo1:27017<<EOF
+var config = {
     "_id": "rs0",
     "version": 1,
     "members": [
@@ -19,6 +19,8 @@ mongosh --host localhost:27017 <<EOF
         "priority": 0
       }
     ]
-  };
-  rs.initiate(cfg);
+};
+rs.initiate(config, { force: true });
 EOF
+
+echo "Bitti"

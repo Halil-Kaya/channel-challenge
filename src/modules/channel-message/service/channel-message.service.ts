@@ -81,7 +81,7 @@ export class ChannelMessageService {
     }
 
     async readMessages({ payload, client }: SocketEmit<ChannelMessagesReadEmit>): Promise<ChannelMessagesReadAck> {
-        const { messageIds } = payload;
+        let { messageIds } = payload;
         let lock;
         try {
             lock = await this.lockService.lock(cacheKeys.channel_message_read(client._id), {
@@ -95,16 +95,27 @@ export class ChannelMessageService {
         const session = await this.mongoConnection.startSession();
         await session.startTransaction();
         try {
+            const messagesOfUser = await this.channelMessageRepository.find({
+                _id: { $in: messageIds },
+                sender: client._id
+            });
+            const messageIdsBelongsUser = messagesOfUser.map((message) => message._id);
+            messageIds = messageIds.filter(function (val) {
+                return messageIdsBelongsUser.indexOf(val) == -1;
+            });
             await this.channelMessageReadRepository.bulkWrite(
                 messageIds.map((messageId) => {
                     return {
                         messageId,
                         userId: client._id
                     };
-                }),
-                session
+                })
             );
-            await this.unseenChannelMessageRepository.deleteMany(client._id, messageIds, session);
+            await this.unseenChannelMessageRepository.deleteMany(client._id, messageIds);
+            for (const messageId of messageIds) {
+                const totalMessageReadCount = await this.channelMessageReadRepository.getCount({ messageId });
+                await this.channelMessageRepository.updateSeenCount(messageId, totalMessageReadCount);
+            }
         } catch (err) {
             await session.abortTransaction();
             throw err;

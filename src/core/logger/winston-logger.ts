@@ -31,7 +31,7 @@ const consoleLogFormat = winston.format.combine(
                 }] ${logMessage.err?.message?.toUpperCase()}: ${chalk.yellow(
                     logMessage.respTime ? logMessage.respTime + 'ms' : ''
                 )} `
-            )} ${chalk.gray(
+            )} ${chalk.red(
                 JSON.stringify({
                     body: logMessage.body,
                     meta: logMessage.meta,
@@ -46,7 +46,7 @@ const consoleLogFormat = winston.format.combine(
                 `[${logMessage.method}] [${logMessage.type}] [${logMessage.reqId}] [${
                     logMessage.userId + '|' + logMessage.userNickname
                 }] [${logMessage.event}]: ${chalk.yellow(logMessage.respTime ? logMessage.respTime + 'ms' : '')}`
-            )} ${chalk.gray(
+            )} ${chalk.red(
                 JSON.stringify({
                     body: logMessage.body,
                     meta: logMessage.meta,

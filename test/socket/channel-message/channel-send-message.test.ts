@@ -191,7 +191,7 @@ it('Should save messages for offline users', async () => {
 });
 
 it('should offline users receive messages after be online', async () => {
-    const [A, B, C] = await haveUsers(5);
+    const [A, B, C] = await haveUsers(3);
     customUsers.push(A, B, C);
     await Promise.all([A.connect(), B.connect(), C.connect()]);
     const { _id: channelId } = await createChannel(A.client);

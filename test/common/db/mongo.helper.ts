@@ -4,7 +4,12 @@ import { UserModel, UserSchema } from '../../../src/modules/user/model/user.mode
 import { CollectionName } from '../../../src/core/interface';
 import { ChannelUserModel, ChannelUserSchema } from '../../../src/modules/channel-user/model/channel-user.model';
 import { ChannelModel, ChannelSchema } from '../../../src/modules/channel/model/channel.model';
-import { UnseenChannelMessageModel, UnseenChannelMessageSchema } from '../../../src/modules/channel-message/model';
+import {
+    ChannelMessageModel,
+    ChannelMessageSchema,
+    UnseenChannelMessageModel,
+    UnseenChannelMessageSchema
+} from '../../../src/modules/channel-message/model';
 
 export const mongoDb = mongoose.connection;
 
@@ -34,4 +39,7 @@ export const ChannelUserMongoModel = <Model<ChannelUserModel>>(
 );
 export const UnseenChannelMessageMongoModel = <Model<UnseenChannelMessageModel>>(
     mongoDb.model(UnseenChannelMessageModel.name, UnseenChannelMessageSchema, CollectionName.UNSEEN_CHANNEL_MESSAGE)
+);
+export const ChannelMessageMongoModel = <Model<ChannelMessageModel>>(
+    mongoDb.model(ChannelMessageModel.name, ChannelMessageSchema, CollectionName.CHANNEL_MESSAGE)
 );

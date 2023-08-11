@@ -33,8 +33,7 @@ services:
             - './../environments/.env:/project/environments/env:ro'
             - './../logs:/project/logs'
         depends_on:
-            - mongo1
-            - mongo2
+            - mongo-db
             - redis-db
 
     channel-challenge-2:
@@ -51,37 +50,13 @@ services:
             - './../environments/.env:/project/environments/env:ro'
             - './../logs:/project/logs'
         depends_on:
-            - mongo1
-            - mongo2
+            - mongo-db
             - redis-db
 
-    mongo1:
+    mongo-db:
         image: mongo
         ports:
             - '27016:27017'
-        restart: always
-        entrypoint: ['/usr/bin/mongod', '--bind_ip_all', '--replSet', 'rs0']
-        networks:
-            - app-net
-
-    mongo2:
-        image: mongo
-        ports:
-            - '27015:27017'
-        restart: always
-        entrypoint: ['/usr/bin/mongod', '--bind_ip_all', '--replSet', 'rs0']
-        networks:
-            - app-net
-
-    mongosetup:
-        image: mongo
-        depends_on:
-            - mongo1
-            - mongo2
-        volumes:
-            - .:/scripts
-        restart: 'no'
-        entrypoint: ['bash', '/scripts/mongo_setup.sh']
         networks:
             - app-net
 

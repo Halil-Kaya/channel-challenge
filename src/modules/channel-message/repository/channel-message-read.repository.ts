@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { ClientSession, Model } from 'mongoose';
+import { ClientSession, FilterQuery, Model } from 'mongoose';
 import { ChannelMessageReadDocument, ChannelMessageReadModel } from '../model';
 import { ChannelMessageRead } from '../../../core/interface';
 
@@ -27,5 +27,9 @@ export class ChannelMessageReadRepository {
             }),
             { ordered: false, session }
         );
+    }
+
+    getCount(filter: FilterQuery<ChannelMessageRead>, session?: ClientSession) {
+        return this.channelMessageReadModel.count(filter).session(session);
     }
 }
