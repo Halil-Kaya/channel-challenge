@@ -124,12 +124,13 @@ export class ChannelMessageService {
                         messageId,
                         userId: client._id
                     };
-                })
+                }),
+                session
             );
-            await this.unseenChannelMessageRepository.deleteMany(client._id, messageIds);
+            await this.unseenChannelMessageRepository.deleteMany(client._id, messageIds, session);
             for (const messageId of messageIds) {
-                const totalMessageReadCount = await this.channelMessageReadRepository.getCount({ messageId });
-                await this.channelMessageRepository.updateSeenCount(messageId, totalMessageReadCount);
+                const totalMessageReadCount = await this.channelMessageReadRepository.getCount({ messageId }, session);
+                await this.channelMessageRepository.updateSeenCount(messageId, totalMessageReadCount, session);
             }
         } catch (err) {
             await session.abortTransaction();

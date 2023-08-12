@@ -43,16 +43,23 @@ export class ChannelService {
         let channel;
         await session.withTransaction(
             async () => {
-                channel = await this.channelRepository.save({
-                    ...payload,
-                    owner: client._id.toString()
-                });
-                await this.channelUserInternalService.findOneAndUpdate(channel._id, {
-                    channelId: channel._id,
-                    userId: channel.owner,
-                    role: ChannelUserRole.OWNER,
-                    status: ChannelUserStatus.ACTIVE
-                });
+                channel = await this.channelRepository.save(
+                    {
+                        ...payload,
+                        owner: client._id.toString()
+                    },
+                    session
+                );
+                await this.channelUserInternalService.findOneAndUpdate(
+                    channel._id,
+                    {
+                        channelId: channel._id,
+                        userId: channel.owner,
+                        role: ChannelUserRole.OWNER,
+                        status: ChannelUserStatus.ACTIVE
+                    },
+                    session
+                );
             },
             { retryWrites: true }
         );
