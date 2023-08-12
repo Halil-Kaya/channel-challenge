@@ -1,5 +1,7 @@
 import { Socket } from 'socket.io-client';
 import {
+    ChannelMessagesGetAck,
+    ChannelMessagesGetEmit,
     ChannelMessagesReadAck,
     ChannelMessagesReadEmit,
     ChannelSendMessageAck,
@@ -28,6 +30,20 @@ export const channelMessagesRead = async (
 ): Promise<ChannelMessagesReadAck> => {
     return new Promise((res, rej) => {
         client.emit(ChannelMessageGatewayEvent.CHANNEL_MESSAGES_READ, encrypt(dto), (error, response) => {
+            if (error) {
+                rej(decrypt(error));
+            }
+            res(decrypt(response));
+        });
+    });
+};
+
+export const channelGetMessages = async (
+    client: Socket,
+    dto: ChannelMessagesGetEmit
+): Promise<ChannelMessagesGetAck> => {
+    return new Promise((res, rej) => {
+        client.emit(ChannelMessageGatewayEvent.CHANNEL_MESSAGES_GET, encrypt(dto), (error, response) => {
             if (error) {
                 rej(decrypt(error));
             }

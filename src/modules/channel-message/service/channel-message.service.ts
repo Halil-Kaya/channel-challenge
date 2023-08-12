@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { ChannelMessageReadRepository, ChannelMessageRepository, UnseenChannelMessageRepository } from '../repository';
 import { ChannelSendMessageBroadcastEvent, SocketEmit } from '../../../core/interface';
 import {
+    ChannelMessagesGetAck,
+    ChannelMessagesGetEmit,
     ChannelMessagesReadAck,
     ChannelMessagesReadEmit,
     ChannelSendMessageAck,
@@ -81,7 +83,20 @@ export class ChannelMessageService {
     }
 
     async readMessages({ payload, client }: SocketEmit<ChannelMessagesReadEmit>): Promise<ChannelMessagesReadAck> {
-        let { messageIds } = payload;
+        let { messageIds, channelId } = payload;
+
+        const channel = await this.channelInternalService.findById(channelId);
+
+        if (!channel) {
+            throw new ChannelNotFoundException();
+        }
+
+        const isInChannel = await this.channelUserService.isInChannel(client._id, channelId);
+
+        if (!isInChannel) {
+            throw new UserNotInChannelException();
+        }
+
         let lock;
         try {
             lock = await this.lockService.lock(cacheKeys.channel_message_read(client._id), {
@@ -124,5 +139,42 @@ export class ChannelMessageService {
             await lock.release();
         }
         return;
+    }
+
+    async getMessages({ payload, client }: SocketEmit<ChannelMessagesGetEmit>): Promise<ChannelMessagesGetAck> {
+        const { channelId, limit, next, prev, around } = payload;
+
+        const channel = await this.channelInternalService.findById(channelId);
+
+        if (!channel) {
+            throw new ChannelNotFoundException();
+        }
+
+        const isInChannel = await this.channelUserService.isInChannel(client._id, channelId);
+
+        if (!isInChannel) {
+            throw new UserNotInChannelException();
+        }
+
+        const channelMessages = await this.channelMessageRepository.paginateMessages({
+            channelId,
+            next,
+            prev,
+            around,
+            limit
+        });
+
+        return {
+            messages: channelMessages.map((channelMessage) => {
+                return {
+                    messageId: channelMessage._id,
+                    channelId: channelMessage.channelId,
+                    message: channelMessage.message,
+                    sender: channelMessage.sender,
+                    seenCount: channelMessage.seenCount,
+                    createdAt: channelMessage.createdAt
+                };
+            })
+        };
     }
 }
