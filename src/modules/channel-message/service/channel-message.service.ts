@@ -129,7 +129,7 @@ export class ChannelMessageService {
             );
             await this.unseenChannelMessageRepository.deleteMany(client._id, messageIds, session);
             for (const messageId of messageIds) {
-                const totalMessageReadCount = await this.channelMessageReadRepository.getCount({ messageId }, session);
+                const totalMessageReadCount = await this.channelMessageReadRepository.getCount({ messageId });
                 await this.channelMessageRepository.updateSeenCount(messageId, totalMessageReadCount, session);
             }
         } catch (err) {
