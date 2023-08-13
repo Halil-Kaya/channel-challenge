@@ -29,6 +29,47 @@
 -   Docker configuration
 -   An example of using the `@golevelup/nestjs-discovery` package
 
+### You can find scenarios and code flow in the test folder.
+
+```bash
+test
+├── api
+    ├── auth
+        └── sign-in.test.ts
+    └── user
+        └── user-create.test.ts
+├── common
+    ├── auth.helper.ts
+    ├── channel-message.helper.ts
+    ├── channel.helper.ts
+    ├── crypto.helper.ts
+    ├── db
+        ├── elasticsearch.helper.ts
+        ├── index.ts
+        ├── mongo.helper.ts
+        └── redis.helper.ts
+    ├── have-users.helper.ts
+    ├── helper.ts
+    ├── index.ts
+    ├── init-socket.ts
+    └── user.helper.ts
+├── jest-e2e.json
+├── socket
+  ├── channel
+      ├── channel-create.test.ts
+      ├── channel-join.test.ts
+      ├── channel-leave.test.ts
+      └── channel-search.test.ts
+  ├── channel-message
+      ├── channel-message-read.test.ts
+      ├── channel-messages-get.test.ts
+      └── channel-send-message.test.ts
+  └── user
+      └── connection.test.ts
+├── test-config.ts
+└── test-setup.ts
+```
+
 ## To Run Project
 
 ```bash
@@ -50,48 +91,9 @@ $ npm run test
 $ docker-compose down
 ```
 
-## Sending and handling rabbitMQ events
+### Contributing
 
----
-> if you want to send event and handle it you can use my EventPublisher class
-> 
-#### example of sending message 
-
-```ts
-this.eventPublisher.publishToBroadcast<ChannelSendMessageBroadcastEvent>(
-    ChannelMessageBroadcast.CHANNEL_MESSAGE_SEND,
-    {
-        client,
-        reqId,
-        payload: {
-            message: messageAck
-        }
-    }
-);
-```
-
-### example of receiveng message
-
-
-```ts
-@RabbitmqQueueuHandler(ChannelMessageBroadcast.CHANNEL_MESSAGE_SEND)
-async handleChannelMessageSend({ payload, client, reqId }: BroadcastEvent<ChannelSendMessageBroadcastEvent>){
-    const { message } = payload;
-    //...
-}
-```
-
-## Daily Logging and Customize logs 
-
----
-> If you want to logs your flow and also want to customize logs you can inspect my logger codes
-
-### example console log
-![img.png](img.png)
-
-
-
-## 
+> Contributions to this project are welcome. Feel free to fork this repository, make changes, and submit pull requests.
 
 ### License
 
